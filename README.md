@@ -153,29 +153,209 @@ uvx --from . python pdg_cli.py decays --particle "tau-"
 
 ## 🐍 Python API Usage
 
+### Basic Example
 ```python
 import asyncio
-import pdg_mcp_server as server
+import json
+import pdg_mcp_server as pdgmcp
 
-async def example():
+async def basic_example():
     # Search for a particle
-    result = await server.handle_call_tool('search_particle', {'query': 'electron'})
-    print(result[0].text)
+    result = await pdgmcp.handle_call_tool('search_particle', {'query': 'electron'})
+    data = json.loads(result[0].text)
+    print(f"Found: {data[0]['name']} (mass: {data[0]['mass']})")
     
-    # Get particle properties
-    result = await server.handle_call_tool('get_particle_properties', 
+    # Get detailed properties
+    result = await pdgmcp.handle_call_tool('get_particle_properties', 
                                          {'particle_name': 'proton'})
-    print(result[0].text)
-    
-    # Compare particles
-    result = await server.handle_call_tool('compare_particles', {
-        'particle_names': ['electron', 'muon'], 
-        'properties': ['mass', 'lifetime']
-    })
-    print(result[0].text)
+    data = json.loads(result[0].text)
+    print(f"Proton mass: {data['mass']}, lifetime: {data['lifetime']}")
 
-# Run example
-asyncio.run(example())
+asyncio.run(basic_example())
+```
+
+### Advanced Research Example
+```python
+import asyncio
+import json
+import pdg_mcp_server as pdgmcp
+
+async def research_workflow():
+    """Complete particle physics research workflow."""
+    
+    # 1. Compare lepton family
+    print("=== Lepton Family Comparison ===")
+    result = await pdgmcp.handle_call_tool('compare_particles', {
+        'particle_names': ['e-', 'mu-', 'tau-'],
+        'properties': ['mass', 'lifetime', 'charge']
+    })
+    leptons = json.loads(result[0].text)
+    
+    for particle in leptons['particles']:
+        print(f"{particle['name']}: {particle['mass']}, τ={particle['lifetime']}")
+    
+    # 2. Study tau decays
+    print("\n=== Tau Decay Modes ===")
+    result = await pdgmcp.handle_call_tool('get_branching_fractions', {
+        'particle_name': 'tau-',
+        'decay_type': 'exclusive',
+        'limit': 5
+    })
+    decays = json.loads(result[0].text)
+    
+    for i, decay in enumerate(decays['decay_modes'], 1):
+        print(f"{i}. {decay['description']} ({decay['display_value']})")
+    
+    # 3. Monte Carlo ID lookup
+    print("\n=== Monte Carlo ID Lookup ===")
+    mcids = [11, 13, 15, 211, 2212]  # e-, mu-, tau-, pi+, proton
+    
+    for mcid in mcids:
+        result = await pdgmcp.handle_call_tool('get_particle_by_mcid', {'mcid': mcid})
+        particle = json.loads(result[0].text)
+        print(f"MCID {mcid}: {particle['name']} ({particle['mass']})")
+
+asyncio.run(research_workflow())
+```
+
+### Error Handling Example
+```python
+import asyncio
+import json
+import pdg_mcp_server as pdgmcp
+
+async def safe_particle_lookup(particle_name):
+    """Safely look up particle with error handling."""
+    try:
+        result = await pdgmcp.handle_call_tool('get_particle_properties', 
+                                             {'particle_name': particle_name})
+        data = json.loads(result[0].text)
+        
+        if 'error' in data:
+            print(f"Error: {data['error']}")
+            return None
+        
+        return {
+            'name': data['name'],
+            'mass': data.get('mass', 'Unknown'),
+            'charge': data.get('charge', 'Unknown')
+        }
+        
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
+
+async def error_example():
+    # Valid particle
+    proton = await safe_particle_lookup('proton')
+    if proton:
+        print(f"✓ {proton['name']}: {proton['mass']}")
+    
+    # Invalid particle
+    invalid = await safe_particle_lookup('invalid_particle')
+    if not invalid:
+        print("✗ Particle not found")
+
+asyncio.run(error_example())
+```
+
+### Batch Processing Example
+```python
+import asyncio
+import json
+import pdg_mcp_server as pdgmcp
+
+async def batch_particle_analysis():
+    """Process multiple particles efficiently."""
+    
+    particles_of_interest = [
+        'electron', 'muon', 'tau-',
+        'pi+', 'pi-', 'K+', 'K-',
+        'proton', 'neutron'
+    ]
+    
+    results = []
+    
+    for particle in particles_of_interest:
+        try:
+            result = await pdgmcp.handle_call_tool('get_particle_properties', 
+                                                 {'particle_name': particle})
+            data = json.loads(result[0].text)
+            
+            if 'error' not in data:
+                results.append({
+                    'name': data['name'],
+                    'mass': data.get('mass', 'N/A'),
+                    'charge': data.get('charge', 'N/A'),
+                    'mcid': data.get('mcid', 'N/A')
+                })
+        except:
+            continue
+    
+    # Sort by mass
+    results.sort(key=lambda x: float(x['mass'].split()[0]) if 'GeV' in x['mass'] else 0)
+    
+    print("Particles sorted by mass:")
+    for particle in results:
+        print(f"{particle['name']:<10} {particle['mass']:<15} {particle['charge']:<5} MCID:{particle['mcid']}")
+
+asyncio.run(batch_particle_analysis())
+```
+
+### Custom Helper Functions
+```python
+import asyncio
+import json
+import pdg_mcp_server as pdgmcp
+
+class PDGHelper:
+    """Helper class for common PDG operations."""
+    
+    @staticmethod
+    async def get_mass(particle_name):
+        """Get particle mass in GeV."""
+        result = await pdgmcp.handle_call_tool('get_particle_properties', 
+                                             {'particle_name': particle_name})
+        data = json.loads(result[0].text)
+        return data.get('mass', 'Unknown') if 'error' not in data else None
+    
+    @staticmethod
+    async def find_by_charge(charge, particle_type='all', limit=10):
+        """Find particles with specific charge."""
+        result = await pdgmcp.handle_call_tool('list_particles', {
+            'particle_type': particle_type,
+            'limit': 100
+        })
+        data = json.loads(result[0].text)
+        
+        if 'error' in data:
+            return []
+        
+        filtered = [p for p in data['particles'] if p.get('charge') == charge]
+        return filtered[:limit]
+    
+    @staticmethod
+    async def mass_comparison(particles):
+        """Compare masses of multiple particles."""
+        result = await pdgmcp.handle_call_tool('compare_particles', {
+            'particle_names': particles,
+            'properties': ['mass']
+        })
+        data = json.loads(result[0].text)
+        return data['particles'] if 'error' not in data else []
+
+async def helper_example():
+    # Use helper functions
+    print("Electron mass:", await PDGHelper.get_mass('electron'))
+    
+    charged_particles = await PDGHelper.find_by_charge(1.0, 'meson', 5)
+    print("Charged mesons:", [p['name'] for p in charged_particles])
+    
+    mass_data = await PDGHelper.mass_comparison(['proton', 'neutron'])
+    for p in mass_data:
+        print(f"{p['name']}: {p.get('mass', 'N/A')}")
+
+asyncio.run(helper_example())
 ```
 
 ---
