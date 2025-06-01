@@ -9,6 +9,7 @@ A powerful **Model Context Protocol (MCP) server** that provides seamless access
 - **CLI Interface** for terminal usage  
 - **Comprehensive Testing** suite included
 - **Production Ready** with Docker support
+- **Python 3.10+** required (MCP dependency)
 
 ---
 
