@@ -1,0 +1,52 @@
+# Docker Compose Override for Development
+# This file is automatically used by docker-compose for development purposes
+# It enables hot-reloading by mounting source code as volumes
+
+version: '3.8'
+
+services:
+  pdg-mcp-server:
+    # Override volumes for development
+    volumes:
+      # Mount source code for hot-reloading during development
+      - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
+      - ./test_pdg_server.py:/app/test_pdg_server.py
+      - ./examples.py:/app/examples.py
+      - ./requirements.txt:/app/requirements.txt
+      
+      # Keep data persistence
+      - pdg_data:/app/data
+    
+    # Development environment variables
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PDG_LOG_LEVEL=DEBUG
+      - PDG_DEV_MODE=true
+    
+    # For development, restart on code changes
+    restart: unless-stopped
+    
+    # Enable interactive mode for debugging
+    stdin_open: true
+    tty: true
+
+  pdg-mcp-test:
+    volumes:
+      - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
+      - ./test_pdg_server.py:/app/test_pdg_server.py
+      - ./examples.py:/app/examples.py
+      - pdg_data:/app/data
+    
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PDG_LOG_LEVEL=DEBUG
+
+  pdg-mcp-examples:
+    volumes:
+      - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
+      - ./examples.py:/app/examples.py
+      - pdg_data:/app/data
+    
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PDG_LOG_LEVEL=DEBUG 
