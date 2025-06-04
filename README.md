@@ -48,35 +48,6 @@ Add to your MCP client configuration:
 }
 ```
 
-## 📊 Modular Architecture
-
-The server is organized into **8 specialized modules** with **64 total tools**:
-
-| Module | Tools | Description |
-|--------|-------|-------------|
-| **API** | 11 | Core particle search, properties, comparison |
-| **Data** | 11 | Data handling, unit conversion, summary values |
-| **Decay** | 5 | Branching fractions, decay analysis |
-| **Error** | 4 | Error handling, validation, diagnostics |
-| **Measurement** | 8 | PDG measurement objects and analysis |
-| **Particle** | 10 | PDG particle objects and quantum numbers |
-| **Units** | 7 | Physics unit conversions and constants |
-| **Utils** | 8 | PDG utility functions and data processing |
-
-### 🔧 Module Organization
-
-```
-pdg_modules/
-├── __init__.py          # Package initialization  
-├── api.py              # Core API functionality (11 tools)
-├── data.py             # Data handling and measurements (11 tools)
-├── decay.py            # Decay analysis and branching fractions (5 tools)
-├── errors.py           # Error handling and diagnostics (4 tools)
-├── measurement.py      # PDG measurement objects and analysis (8 tools)
-├── particle.py         # PDG particle objects and quantum numbers (10 tools)
-├── units.py            # Physics unit conversions and constants (7 tools)
-└── utils.py            # PDG utility functions and data processing (8 tools)
-```
 
 ## 💬 Example Queries for AI Assistants
 
@@ -279,41 +250,6 @@ python pdg_cli.py quantum-numbers --particle proton
 | Neutron | `n` | 2112 | 0.939565 | 0 |
 | Pion+ | `pi+` | 211 | 0.139570 | +1 |
 
-## 🐳 Docker Commands
-
-```bash
-./docker-run.sh build     # Build image
-./docker-run.sh test      # Run tests  
-./docker-run.sh examples  # Interactive examples
-./docker-run.sh run       # Start server
-./docker-run.sh shell     # Interactive shell
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Run tests: `./docker-run.sh test`  
-4. Commit changes: `git commit -m 'Add amazing feature'`
-5. Push to branch: `git push origin feature/amazing-feature`
-6. Open Pull Request
-
-### Development Guidelines
-
-- **Choose appropriate module** based on functionality
-- **Follow module patterns** for tool definition and handling
-- **Update both server and CLI** implementations
-- **Add comprehensive tests** for new functionality
-- **Update documentation**
-
-## 📈 Benefits of Modular Architecture
-
-1. **Maintainability**: Clear separation of concerns across 8 modules
-2. **Extensibility**: Easy to add new modules or expand existing ones
-3. **Testability**: Module-specific testing strategies
-4. **Documentation**: Focused documentation per module
-5. **Reusability**: Modules can be imported independently
-6. **Collaboration**: Teams can work on different modules
 
 ## 📄 License
 
@@ -336,5 +272,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ---
 
 **🔬 Happy particle physics research!** ⚛️
-
-Built with the complete PDG API ecosystem: 8 modules, 64 tools, production-ready for particle physics research and analysis. 
