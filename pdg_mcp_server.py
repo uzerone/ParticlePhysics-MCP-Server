@@ -9,7 +9,7 @@ branching fractions, and other physics data in a user-friendly way.
 Organized into 8 specialized modules:
 - api: Core API functionality (search, properties, etc.)
 - data: Data handling and measurements
-- decay: Decay analysis and branching fractions  
+- decay: Decay analysis and branching fractions
 - errors: Error handling and diagnostics
 - measurement: PDG measurement objects and analysis
 - particle: PDG particle objects and quantum numbers
@@ -41,7 +41,8 @@ from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
 # Import modular components
-from pdg_modules import api, data, decay, errors, measurement, particle, units, utils
+from pdg_modules import (api, data, decay, errors, measurement, particle,
+                         units, utils)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -77,7 +78,7 @@ server = Server("pdg-server")
 async def handle_list_tools() -> list[types.Tool]:
     """List all available PDG tools from all modules."""
     all_tools = []
-    
+
     # Collect tools from all modules
     all_tools.extend(api.get_api_tools())
     all_tools.extend(data.get_data_tools())
@@ -87,7 +88,7 @@ async def handle_list_tools() -> list[types.Tool]:
     all_tools.extend(particle.get_particle_tools())
     all_tools.extend(units.get_units_tools())
     all_tools.extend(utils.get_utils_tools())
-    
+
     logger.info(f"Loaded {len(all_tools)} tools from modular structure")
     return all_tools
 
@@ -98,17 +99,19 @@ async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent
     try:
         # Ensure PDG API connection
         api_instance = ensure_pdg_connection()
-        
+
         # Get all tool names from each module for routing
         api_tool_names = {tool.name for tool in api.get_api_tools()}
         data_tool_names = {tool.name for tool in data.get_data_tools()}
         decay_tool_names = {tool.name for tool in decay.get_decay_tools()}
         error_tool_names = {tool.name for tool in errors.get_error_tools()}
-        measurement_tool_names = {tool.name for tool in measurement.get_measurement_tools()}
+        measurement_tool_names = {
+            tool.name for tool in measurement.get_measurement_tools()
+        }
         particle_tool_names = {tool.name for tool in particle.get_particle_tools()}
         units_tool_names = {tool.name for tool in units.get_units_tools()}
         utils_tool_names = {tool.name for tool in utils.get_utils_tools()}
-        
+
         # Route to appropriate module handler
         if name in api_tool_names:
             return await api.handle_api_tools(name, arguments, api_instance)
@@ -119,7 +122,9 @@ async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent
         elif name in error_tool_names:
             return await errors.handle_error_tools(name, arguments, api_instance)
         elif name in measurement_tool_names:
-            return await measurement.handle_measurement_tools(name, arguments, api_instance)
+            return await measurement.handle_measurement_tools(
+                name, arguments, api_instance
+            )
         elif name in particle_tool_names:
             return await particle.handle_particle_tools(name, arguments, api_instance)
         elif name in units_tool_names:
@@ -181,6 +186,8 @@ def run_server():
 
 if __name__ == "__main__":
     logger.info("Starting PDG MCP Server...")
-    logger.info("Available modules: api, data, decay, errors, measurement, particle, units, utils")
+    logger.info(
+        "Available modules: api, data, decay, errors, measurement, particle, units, utils"
+    )
     logger.info("Total tools available: 64 across 8 modules")
     run_server()

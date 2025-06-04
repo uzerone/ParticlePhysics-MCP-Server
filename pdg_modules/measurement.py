@@ -11,8 +11,9 @@ Based on the PDG measurement API: https://pdgapi.lbl.gov/doc/pdg.measurement.htm
 """
 
 import json
-import mcp.types as types
 from typing import Any, Dict, List
+
+import mcp.types as types
 
 
 def get_measurement_tools() -> List[types.Tool]:
@@ -259,23 +260,23 @@ def format_pdg_value(value):
             "syst_error_positive": getattr(value, "syst_error_positive", "N/A"),
             "syst_error_negative": getattr(value, "syst_error_negative", "N/A"),
         }
-        
+
         # Calculate symmetric errors safely
         try:
             formatted["error"] = getattr(value, "error", "N/A")
         except:
             formatted["error"] = "N/A"
-            
+
         try:
             formatted["stat_error"] = getattr(value, "stat_error", "N/A")
         except:
             formatted["stat_error"] = "N/A"
-            
+
         try:
             formatted["syst_error"] = getattr(value, "syst_error", "N/A")
         except:
             formatted["syst_error"] = "N/A"
-            
+
         return formatted
     except Exception as e:
         return {"error": f"Failed to format value: {str(e)}"}
@@ -325,9 +326,11 @@ def get_property_by_type(particle, property_type):
         return []
 
 
-async def handle_measurement_tools(name: str, arguments: dict, api) -> List[types.TextContent]:
+async def handle_measurement_tools(
+    name: str, arguments: dict, api
+) -> List[types.TextContent]:
     """Handle measurement-related tool calls."""
-    
+
     if name == "get_measurement_details":
         measurement_id = arguments["measurement_id"]
         include_values = arguments.get("include_values", True)
@@ -337,10 +340,10 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
         try:
             # Import PDG measurement module
             from pdg.measurement import PdgMeasurement
-            
+
             measurement = PdgMeasurement(api, measurement_id)
             result = format_pdg_measurement(measurement)
-            
+
             if include_values:
                 values = []
                 try:
@@ -349,14 +352,14 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                 except:
                     values = []
                 result["values"] = values
-                
+
             if include_reference:
                 try:
                     reference = measurement.reference
                     result["reference"] = format_pdg_reference(reference)
                 except:
                     result["reference"] = "N/A"
-                    
+
             if include_footnotes:
                 footnotes = []
                 try:
@@ -384,10 +387,10 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
 
         try:
             from pdg.measurement import PdgValue
-            
+
             value = PdgValue(api, value_id)
             result = format_pdg_value(value)
-            
+
             if include_error_breakdown:
                 # Add detailed error analysis
                 try:
@@ -398,8 +401,14 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                         "statistical_error_negative": value.stat_error_negative,
                         "systematic_error_positive": value.syst_error_positive,
                         "systematic_error_negative": value.syst_error_negative,
-                        "has_asymmetric_errors": value.error_positive != value.error_negative,
-                        "error_dominance": "systematic" if (value.syst_error_positive or 0) > (value.stat_error_positive or 0) else "statistical"
+                        "has_asymmetric_errors": value.error_positive
+                        != value.error_negative,
+                        "error_dominance": (
+                            "systematic"
+                            if (value.syst_error_positive or 0)
+                            > (value.stat_error_positive or 0)
+                            else "statistical"
+                        ),
                     }
                     result["error_analysis"] = error_analysis
                 except:
@@ -423,15 +432,21 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
 
         try:
             from pdg.measurement import PdgReference
-            
+
             reference = PdgReference(api, reference_id)
             result = format_pdg_reference(reference)
-            
+
             if include_doi:
                 # Add additional identifiers and links
                 result["external_links"] = {
-                    "doi_url": f"https://doi.org/{reference.doi}" if reference.doi else None,
-                    "inspire_url": f"https://inspirehep.net/literature/{reference.inspire_id}" if reference.inspire_id else None,
+                    "doi_url": (
+                        f"https://doi.org/{reference.doi}" if reference.doi else None
+                    ),
+                    "inspire_url": (
+                        f"https://inspirehep.net/literature/{reference.inspire_id}"
+                        if reference.inspire_id
+                        else None
+                    ),
                 }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
@@ -462,34 +477,41 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
             for prop_type in ["mass", "lifetime", "width"]:
                 if count >= limit:
                     break
-                    
+
                 for prop in get_property_by_type(particle, prop_type):
                     if count >= limit:
                         break
-                        
+
                     for measurement in prop.get_measurements():
                         if count >= limit:
                             break
-                            
+
                         try:
                             reference = measurement.reference
-                            
+
                             # Apply filters
-                            if publication_year and reference.publication_year != publication_year:
+                            if (
+                                publication_year
+                                and reference.publication_year != publication_year
+                            ):
                                 continue
                             if doi and reference.doi != doi:
                                 continue
-                            if author and author.lower() not in (reference.document_id or "").lower():
+                            if (
+                                author
+                                and author.lower()
+                                not in (reference.document_id or "").lower()
+                            ):
                                 continue
-                                
+
                             # Format measurement with reference
                             meas_data = format_pdg_measurement(measurement)
                             meas_data["reference"] = format_pdg_reference(reference)
                             meas_data["property_type"] = prop_type
-                            
+
                             measurements.append(meas_data)
                             count += 1
-                            
+
                         except:
                             continue
 
@@ -510,7 +532,9 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to search measurements by reference: {str(e)}"},
+                        {
+                            "error": f"Failed to search measurements by reference: {str(e)}"
+                        },
                         indent=2,
                     ),
                 )
@@ -522,10 +546,10 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
 
         try:
             from pdg.measurement import PdgFootnote
-            
+
             footnote = PdgFootnote(api, footnote_id)
             result = format_pdg_footnote(footnote)
-            
+
             if include_references:
                 references = []
                 try:
@@ -575,39 +599,40 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
             for prop in get_property_by_type(particle, property_type):
                 if count >= limit:
                     break
-                    
+
                 for measurement in prop.get_measurements():
                     if count >= limit:
                         break
-                        
+
                     try:
                         # Get the primary value for this measurement
                         value = measurement.get_value()
-                        
+
                         meas_analysis = {
                             "measurement_id": measurement.id,
                             "value": value.value,
                             "has_stat_error": value.stat_error_positive is not None,
                             "has_syst_error": value.syst_error_positive is not None,
-                            "is_asymmetric": value.error_positive != value.error_negative,
+                            "is_asymmetric": value.error_positive
+                            != value.error_negative,
                             "relative_stat_error": None,
                             "relative_syst_error": None,
                         }
-                        
+
                         # Calculate relative errors
                         if value.value and value.stat_error_positive:
                             rel_stat = abs(value.stat_error_positive / value.value)
                             meas_analysis["relative_stat_error"] = rel_stat
                             stat_errors.append(rel_stat)
-                            
+
                         if value.value and value.syst_error_positive:
                             rel_syst = abs(value.syst_error_positive / value.value)
                             meas_analysis["relative_syst_error"] = rel_syst
                             syst_errors.append(rel_syst)
-                        
+
                         analysis["measurements_analyzed"].append(meas_analysis)
                         count += 1
-                        
+
                         # Update statistics
                         analysis["error_statistics"]["total_measurements"] += 1
                         if value.stat_error_positive is not None:
@@ -616,15 +641,19 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                             analysis["error_statistics"]["with_systematic_errors"] += 1
                         if value.error_positive != value.error_negative:
                             analysis["error_statistics"]["with_asymmetric_errors"] += 1
-                            
+
                     except:
                         continue
 
             # Calculate averages
             if stat_errors:
-                analysis["error_statistics"]["average_relative_stat_error"] = sum(stat_errors) / len(stat_errors)
+                analysis["error_statistics"]["average_relative_stat_error"] = sum(
+                    stat_errors
+                ) / len(stat_errors)
             if syst_errors:
-                analysis["error_statistics"]["average_relative_syst_error"] = sum(syst_errors) / len(syst_errors)
+                analysis["error_statistics"]["average_relative_syst_error"] = sum(
+                    syst_errors
+                ) / len(syst_errors)
 
             return [types.TextContent(type="text", text=json.dumps(analysis, indent=2))]
         except Exception as e:
@@ -650,41 +679,47 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
             count = 0
 
             # Determine which property types to analyze
-            prop_types = ["mass", "lifetime", "width"] if property_type == "all" else [property_type]
+            prop_types = (
+                ["mass", "lifetime", "width"]
+                if property_type == "all"
+                else [property_type]
+            )
 
             for prop_type in prop_types:
                 if count >= limit:
                     break
-                    
+
                 for prop in get_property_by_type(particle, prop_type):
                     if count >= limit:
                         break
-                        
+
                     for measurement in prop.get_measurements():
                         if count >= limit:
                             break
-                            
+
                         try:
                             meas_data = format_pdg_measurement(measurement)
                             meas_data["property_type"] = prop_type
-                            
+
                             # Add values
                             values = []
                             for value in measurement.values():
                                 values.append(format_pdg_value(value))
                             meas_data["values"] = values
-                            
+
                             # Add reference if requested
                             if include_references:
                                 try:
                                     reference = measurement.reference
-                                    meas_data["reference"] = format_pdg_reference(reference)
+                                    meas_data["reference"] = format_pdg_reference(
+                                        reference
+                                    )
                                 except:
                                     meas_data["reference"] = "N/A"
-                            
+
                             all_measurements.append(meas_data)
                             count += 1
-                            
+
                         except:
                             continue
 
@@ -721,14 +756,14 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
             for prop in get_property_by_type(particle, property_type):
                 if count >= limit:
                     break
-                    
+
                 for measurement in prop.get_measurements():
                     if count >= limit:
                         break
-                        
+
                     try:
                         technique = measurement.technique or "Unknown"
-                        
+
                         if technique not in techniques:
                             techniques[technique] = {
                                 "technique": technique,
@@ -737,45 +772,62 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                                 "average_precision": None,
                                 "year_range": {"earliest": None, "latest": None},
                             }
-                        
+
                         # Add measurement info
                         meas_info = {
                             "measurement_id": measurement.id,
-                            "year": getattr(measurement.reference, "publication_year", "N/A"),
+                            "year": getattr(
+                                measurement.reference, "publication_year", "N/A"
+                            ),
                             "value": None,
                             "relative_error": None,
                         }
-                        
+
                         # Get primary value and calculate precision
                         try:
                             value = measurement.get_value()
                             meas_info["value"] = value.value
                             if value.value and value.error_positive:
-                                meas_info["relative_error"] = abs(value.error_positive / value.value)
+                                meas_info["relative_error"] = abs(
+                                    value.error_positive / value.value
+                                )
                         except:
                             pass
-                        
+
                         techniques[technique]["measurements"].append(meas_info)
                         techniques[technique]["measurement_count"] += 1
-                        
+
                         # Update year range
                         year = meas_info["year"]
                         if year != "N/A":
-                            if techniques[technique]["year_range"]["earliest"] is None or year < techniques[technique]["year_range"]["earliest"]:
+                            if (
+                                techniques[technique]["year_range"]["earliest"] is None
+                                or year
+                                < techniques[technique]["year_range"]["earliest"]
+                            ):
                                 techniques[technique]["year_range"]["earliest"] = year
-                            if techniques[technique]["year_range"]["latest"] is None or year > techniques[technique]["year_range"]["latest"]:
+                            if (
+                                techniques[technique]["year_range"]["latest"] is None
+                                or year > techniques[technique]["year_range"]["latest"]
+                            ):
                                 techniques[technique]["year_range"]["latest"] = year
-                        
+
                         count += 1
-                        
+
                     except:
                         continue
 
             # Calculate average precision for each technique
             for technique_data in techniques.values():
-                relative_errors = [m["relative_error"] for m in technique_data["measurements"] if m["relative_error"] is not None]
+                relative_errors = [
+                    m["relative_error"]
+                    for m in technique_data["measurements"]
+                    if m["relative_error"] is not None
+                ]
                 if relative_errors:
-                    technique_data["average_precision"] = sum(relative_errors) / len(relative_errors)
+                    technique_data["average_precision"] = sum(relative_errors) / len(
+                        relative_errors
+                    )
 
             result = {
                 "particle": particle_name,
@@ -791,7 +843,9 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to compare measurement techniques: {str(e)}"},
+                        {
+                            "error": f"Failed to compare measurement techniques: {str(e)}"
+                        },
                         indent=2,
                     ),
                 )
@@ -800,6 +854,7 @@ async def handle_measurement_tools(name: str, arguments: dict, api) -> List[type
     else:
         return [
             types.TextContent(
-                type="text", text=json.dumps({"error": f"Unknown measurement tool: {name}"})
+                type="text",
+                text=json.dumps({"error": f"Unknown measurement tool: {name}"}),
             )
-        ] 
+        ]

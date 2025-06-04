@@ -6,8 +6,9 @@ when working with PDG data and APIs.
 """
 
 import json
-import mcp.types as types
 from typing import Any, Dict, List
+
+import mcp.types as types
 
 
 def get_error_tools() -> List[types.Tool]:
@@ -45,7 +46,14 @@ def get_error_tools() -> List[types.Tool]:
                 "properties": {
                     "error_type": {
                         "type": "string",
-                        "enum": ["all", "PdgApiError", "PdgInvalidPdgIdError", "PdgNoDataError", "PdgAmbiguousValueError", "PdgRoundingError"],
+                        "enum": [
+                            "all",
+                            "PdgApiError",
+                            "PdgInvalidPdgIdError",
+                            "PdgNoDataError",
+                            "PdgAmbiguousValueError",
+                            "PdgRoundingError",
+                        ],
                         "default": "all",
                         "description": "Specific error type to get information about",
                     },
@@ -120,13 +128,13 @@ def get_pdg_error_info():
             "typical_causes": [
                 "Database connection issues",
                 "API initialization problems",
-                "General PDG library errors"
+                "General PDG library errors",
             ],
             "solutions": [
                 "Check PDG API installation",
                 "Verify database connectivity",
-                "Restart the API connection"
-            ]
+                "Restart the API connection",
+            ],
         },
         "PdgInvalidPdgIdError": {
             "description": "Exception raised when encountering an invalid PDG Identifier",
@@ -135,14 +143,14 @@ def get_pdg_error_info():
                 "Malformed PDG identifier",
                 "Non-existent PDG ID",
                 "Typos in particle names or IDs",
-                "Using outdated PDG identifiers"
+                "Using outdated PDG identifiers",
             ],
             "solutions": [
                 "Check PDG ID format (e.g., 'S008', 'M100')",
                 "Verify particle name spelling",
                 "Use canonical particle names",
-                "Check available identifiers with get_all_pdg_identifiers"
-            ]
+                "Check available identifiers with get_all_pdg_identifiers",
+            ],
         },
         "PdgNoDataError": {
             "description": "Exception raised if no data is found",
@@ -151,14 +159,14 @@ def get_pdg_error_info():
                 "Particle exists but has no measured properties",
                 "Data not available in current PDG edition",
                 "Requesting specific property that doesn't exist",
-                "Database incomplete for certain particles"
+                "Database incomplete for certain particles",
             ],
             "solutions": [
                 "Check if particle has the requested property",
                 "Try a different PDG edition",
                 "Use summary values instead of measurements",
-                "Check particle existence with basic search first"
-            ]
+                "Check particle existence with basic search first",
+            ],
         },
         "PdgAmbiguousValueError": {
             "description": "Exception raised when choice of value is ambiguous and there is no single best value",
@@ -167,14 +175,14 @@ def get_pdg_error_info():
                 "Multiple measurements with no clear best value",
                 "Conflicting data sources",
                 "Properties with multiple representations",
-                "Summary values with different criteria"
+                "Summary values with different criteria",
             ],
             "solutions": [
                 "Specify value type or criteria",
                 "Use get_summary_values to see all options",
                 "Request measurements instead of summary",
-                "Filter by specific value types"
-            ]
+                "Filter by specific value types",
+            ],
         },
         "PdgRoundingError": {
             "description": "Exception raised when PDG rounding is undefined",
@@ -183,15 +191,15 @@ def get_pdg_error_info():
                 "Rounding rules not defined for specific values",
                 "Precision issues with very small/large numbers",
                 "Undefined significant figures",
-                "Custom rounding operations"
+                "Custom rounding operations",
             ],
             "solutions": [
                 "Use raw values without rounding",
                 "Apply manual rounding if needed",
                 "Check value precision requirements",
-                "Use display_value_text instead of numeric values"
-            ]
-        }
+                "Use display_value_text instead of numeric values",
+            ],
+        },
     }
 
 
@@ -199,7 +207,7 @@ def diagnose_query_issues(query, lookup_type="particle_name"):
     """Diagnose common issues with particle/data queries."""
     suggestions = []
     potential_issues = []
-    
+
     # Common particle name issues
     if lookup_type == "particle_name":
         # Check for common misspellings or variations
@@ -217,31 +225,37 @@ def diagnose_query_issues(query, lookup_type="particle_name"):
             "z boson": ["Z0"],
             "higgs": ["H"],
         }
-        
+
         query_lower = query.lower()
         for common_name, pdg_names in common_corrections.items():
             if common_name in query_lower:
-                suggestions.extend([f"Try '{name}' instead of '{query}'" for name in pdg_names])
-        
+                suggestions.extend(
+                    [f"Try '{name}' instead of '{query}'" for name in pdg_names]
+                )
+
         # Check for common formatting issues
         if " " in query:
             potential_issues.append("Particle names usually don't contain spaces")
             suggestions.append(f"Try removing spaces: '{query.replace(' ', '')}'")
-        
+
         if query.endswith("_"):
-            potential_issues.append("Particle names ending with underscore might need specific formatting")
+            potential_issues.append(
+                "Particle names ending with underscore might need specific formatting"
+            )
             suggestions.append(f"Try without underscore: '{query[:-1]}'")
-    
+
     # PDG ID format issues
     elif lookup_type == "pdg_id":
         if not any(c.isdigit() for c in query):
             potential_issues.append("PDG IDs usually contain numbers")
-            suggestions.append("PDG IDs typically follow patterns like 'S008', 'M100', etc.")
-        
+            suggestions.append(
+                "PDG IDs typically follow patterns like 'S008', 'M100', etc."
+            )
+
         if len(query) < 3:
             potential_issues.append("PDG IDs are usually longer")
             suggestions.append("Most PDG IDs are 3+ characters (e.g., 'S008', 'M100')")
-    
+
     # Monte Carlo ID issues
     elif lookup_type == "mcid":
         try:
@@ -253,21 +267,23 @@ def diagnose_query_issues(query, lookup_type="particle_name"):
         except ValueError:
             potential_issues.append("Monte Carlo IDs should be numeric")
             suggestions.append("Monte Carlo IDs are integers (e.g., 211, 2212)")
-    
+
     # General suggestions
     if not suggestions:
         suggestions = [
             "Check particle name spelling",
             "Try canonical PDG names (e.g., 'e-' instead of 'electron')",
             "Use get_canonical_name to find correct naming",
-            "Search with get_particles_by_name for partial matches"
+            "Search with get_particles_by_name for partial matches",
         ]
-    
+
     return {
         "query": query,
         "lookup_type": lookup_type,
-        "potential_issues": potential_issues if potential_issues else ["No obvious issues detected"],
-        "suggestions": suggestions
+        "potential_issues": (
+            potential_issues if potential_issues else ["No obvious issues detected"]
+        ),
+        "suggestions": suggestions,
     }
 
 
@@ -279,19 +295,22 @@ def safe_pdg_operation(operation_func, *args, **kwargs):
         # Try to import PDG errors to check specific types
         try:
             import pdg.errors as pdg_errors
-            
+
             error_info = {
                 "error_type": type(e).__name__,
                 "error_message": str(e),
-                "is_pdg_error": isinstance(e, (
-                    pdg_errors.PdgApiError,
-                    pdg_errors.PdgInvalidPdgIdError,
-                    pdg_errors.PdgNoDataError,
-                    pdg_errors.PdgAmbiguousValueError,
-                    pdg_errors.PdgRoundingError
-                ))
+                "is_pdg_error": isinstance(
+                    e,
+                    (
+                        pdg_errors.PdgApiError,
+                        pdg_errors.PdgInvalidPdgIdError,
+                        pdg_errors.PdgNoDataError,
+                        pdg_errors.PdgAmbiguousValueError,
+                        pdg_errors.PdgRoundingError,
+                    ),
+                ),
             }
-            
+
             # Add specific guidance based on error type
             if isinstance(e, pdg_errors.PdgInvalidPdgIdError):
                 error_info["guidance"] = "Check PDG identifier format and spelling"
@@ -303,16 +322,16 @@ def safe_pdg_operation(operation_func, *args, **kwargs):
                 error_info["guidance"] = "Use raw values or display_value_text"
             else:
                 error_info["guidance"] = "General PDG API error"
-                
+
         except ImportError:
             # Fallback if PDG errors module not available
             error_info = {
                 "error_type": type(e).__name__,
                 "error_message": str(e),
                 "is_pdg_error": "PDG" in type(e).__name__ or "Pdg" in str(e),
-                "guidance": "Check query format and try alternatives"
+                "guidance": "Check query format and try alternatives",
             }
-        
+
         return None, error_info
 
 
@@ -379,9 +398,11 @@ def format_particle_info_safe(particle, include_basic=True, include_measurements
         }
 
 
-async def handle_error_tools(name: str, arguments: dict, api) -> List[types.TextContent]:
+async def handle_error_tools(
+    name: str, arguments: dict, api
+) -> List[types.TextContent]:
     """Handle error-related tool calls."""
-    
+
     if name == "validate_pdg_identifier":
         pdgid = arguments["pdgid"]
         check_data_availability = arguments.get("check_data_availability", True)
@@ -394,7 +415,7 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                 "has_data": False,
                 "error_details": None,
                 "alternatives": [],
-                "suggestions": []
+                "suggestions": [],
             }
 
             # Try to validate the PDG ID
@@ -406,49 +427,59 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
             if error_info:
                 validation_result["error_details"] = error_info
                 validation_result["is_valid"] = False
-                
+
                 # Generate suggestions based on error type
                 if "Invalid" in error_info.get("error_type", ""):
-                    validation_result["suggestions"].extend([
-                        "Check PDG identifier format",
-                        "Verify spelling and capitalization",
-                        "Use standard PDG naming conventions"
-                    ])
+                    validation_result["suggestions"].extend(
+                        [
+                            "Check PDG identifier format",
+                            "Verify spelling and capitalization",
+                            "Use standard PDG naming conventions",
+                        ]
+                    )
             else:
                 validation_result["is_valid"] = True
-                
+
                 # Check if data is available
                 if check_data_availability and result:
                     try:
                         # Try to get some basic properties
-                        if hasattr(result, 'description'):
+                        if hasattr(result, "description"):
                             validation_result["has_data"] = True
                             validation_result["description"] = result.description
-                        elif hasattr(result, '__iter__'):
+                        elif hasattr(result, "__iter__"):
                             validation_result["has_data"] = len(list(result)) > 0
                     except:
                         validation_result["has_data"] = False
 
             # Suggest alternatives if requested and needed
-            if suggest_alternatives and (not validation_result["is_valid"] or not validation_result["has_data"]):
+            if suggest_alternatives and (
+                not validation_result["is_valid"] or not validation_result["has_data"]
+            ):
                 # Try to find similar identifiers
                 try:
                     # Look for similar particle names
                     diagnosis = diagnose_query_issues(pdgid, "pdg_id")
                     validation_result["alternatives"].extend(diagnosis["suggestions"])
-                    
+
                     # Try to find canonical name
                     try:
                         canonical = api.get_canonical_name(pdgid)
                         if canonical != pdgid:
-                            validation_result["alternatives"].append(f"Try canonical name: '{canonical}'")
+                            validation_result["alternatives"].append(
+                                f"Try canonical name: '{canonical}'"
+                            )
                     except:
                         pass
-                        
+
                 except:
                     pass
 
-            return [types.TextContent(type="text", text=json.dumps(validation_result, indent=2))]
+            return [
+                types.TextContent(
+                    type="text", text=json.dumps(validation_result, indent=2)
+                )
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -465,23 +496,23 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
 
         try:
             error_info_data = get_pdg_error_info()
-            
+
             if error_type == "all":
                 result = {
                     "error_types": error_info_data,
                     "total_types": len(error_info_data),
-                    "summary": "PDG API provides specific exception types for different error conditions"
+                    "summary": "PDG API provides specific exception types for different error conditions",
                 }
             else:
                 if error_type in error_info_data:
                     result = {
                         "error_type": error_type,
-                        "details": error_info_data[error_type]
+                        "details": error_info_data[error_type],
                     }
                 else:
                     result = {
                         "error": f"Unknown error type: {error_type}",
-                        "available_types": list(error_info_data.keys())
+                        "available_types": list(error_info_data.keys()),
                     }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
@@ -503,7 +534,7 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
 
         try:
             diagnosis = diagnose_query_issues(query, lookup_type)
-            
+
             # Try actual lookup to get real error information
             def test_lookup():
                 if lookup_type == "particle_name":
@@ -516,18 +547,20 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                     return api.get_particle_by_name(query)
 
             result, error_info = safe_pdg_operation(test_lookup)
-            
+
             diagnosis_result = {
                 "query": query,
                 "lookup_type": lookup_type,
                 "diagnosis": diagnosis,
                 "actual_error": error_info,
-                "lookup_successful": result is not None
+                "lookup_successful": result is not None,
             }
 
             if result is not None:
-                diagnosis_result["success_info"] = "Lookup succeeded - no issues detected"
-                if hasattr(result, 'name'):
+                diagnosis_result["success_info"] = (
+                    "Lookup succeeded - no issues detected"
+                )
+                if hasattr(result, "name"):
                     diagnosis_result["found_particle"] = result.name
 
             if include_suggestions and error_info:
@@ -536,10 +569,14 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                     diagnosis_result["specific_suggestions"] = [
                         "Try get_canonical_name to find correct naming",
                         "Use get_particles_by_name for partial matching",
-                        "Check get_all_pdg_identifiers for valid IDs"
+                        "Check get_all_pdg_identifiers for valid IDs",
                     ]
 
-            return [types.TextContent(type="text", text=json.dumps(diagnosis_result, indent=2))]
+            return [
+                types.TextContent(
+                    type="text", text=json.dumps(diagnosis_result, indent=2)
+                )
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -564,14 +601,16 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                 "success": False,
                 "particle": None,
                 "alternatives": [],
-                "error_details": None
+                "error_details": None,
             }
 
             # Determine search type
             if search_type == "auto":
                 if query.isdigit():
                     search_type = "mcid"
-                elif query.upper().startswith(("S", "M", "G", "T")) and any(c.isdigit() for c in query):
+                elif query.upper().startswith(("S", "M", "G", "T")) and any(
+                    c.isdigit() for c in query
+                ):
                     search_type = "pdgid"
                 else:
                     search_type = "name"
@@ -584,13 +623,13 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                     return api.get_particle_by_mcid(int(query))
                 elif search_type == "pdgid":
                     items = api.get(query)
-                    if hasattr(items, '__iter__'):
+                    if hasattr(items, "__iter__"):
                         particles = []
                         for item in items:
-                            if hasattr(item, 'name'):
+                            if hasattr(item, "name"):
                                 particles.append(item)
                         return particles[0] if particles else None
-                    return items if hasattr(items, 'name') else None
+                    return items if hasattr(items, "name") else None
                 else:
                     return api.get_particle_by_name(query)
 
@@ -601,16 +640,19 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                 lookup_result["particle"] = format_particle_info_safe(result)
                 lookup_result["search_type_used"] = search_type
             else:
-                lookup_result["error_details"] = error_info if include_error_details else None
+                lookup_result["error_details"] = (
+                    error_info if include_error_details else None
+                )
 
                 # Try alternatives if requested
                 if return_alternatives:
                     alternatives = []
-                    
+
                     # Try different search types
                     for alt_type in ["name", "mcid", "pdgid"]:
                         if alt_type != search_type:
                             try:
+
                                 def alt_lookup():
                                     if alt_type == "name":
                                         return api.get_particle_by_name(query)
@@ -621,40 +663,59 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
                                     return None
 
                                 alt_result, _ = safe_pdg_operation(alt_lookup)
-                                if alt_result and hasattr(alt_result, 'name'):
-                                    alternatives.append({
-                                        "method": alt_type,
-                                        "particle": format_particle_info_safe(alt_result)
-                                    })
+                                if alt_result and hasattr(alt_result, "name"):
+                                    alternatives.append(
+                                        {
+                                            "method": alt_type,
+                                            "particle": format_particle_info_safe(
+                                                alt_result
+                                            ),
+                                        }
+                                    )
                             except:
                                 continue
 
                     # Try partial name matching
                     try:
+
                         def partial_lookup():
-                            return list(api.get_particles_by_name(query, case_sensitive=False))[:3]
+                            return list(
+                                api.get_particles_by_name(query, case_sensitive=False)
+                            )[:3]
 
                         partial_results, _ = safe_pdg_operation(partial_lookup)
                         if partial_results:
                             for particle_list in partial_results:
-                                if hasattr(particle_list, '__iter__'):
+                                if hasattr(particle_list, "__iter__"):
                                     for particle in particle_list:
-                                        if hasattr(particle, 'name'):
-                                            alternatives.append({
-                                                "method": "partial_match",
-                                                "particle": format_particle_info_safe(particle)
-                                            })
-                                elif hasattr(particle_list, 'name'):
-                                    alternatives.append({
-                                        "method": "partial_match",
-                                        "particle": format_particle_info_safe(particle_list)
-                                    })
+                                        if hasattr(particle, "name"):
+                                            alternatives.append(
+                                                {
+                                                    "method": "partial_match",
+                                                    "particle": format_particle_info_safe(
+                                                        particle
+                                                    ),
+                                                }
+                                            )
+                                elif hasattr(particle_list, "name"):
+                                    alternatives.append(
+                                        {
+                                            "method": "partial_match",
+                                            "particle": format_particle_info_safe(
+                                                particle_list
+                                            ),
+                                        }
+                                    )
                     except:
                         pass
 
-                    lookup_result["alternatives"] = alternatives[:5]  # Limit to 5 alternatives
+                    lookup_result["alternatives"] = alternatives[
+                        :5
+                    ]  # Limit to 5 alternatives
 
-            return [types.TextContent(type="text", text=json.dumps(lookup_result, indent=2))]
+            return [
+                types.TextContent(type="text", text=json.dumps(lookup_result, indent=2))
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -671,4 +732,4 @@ async def handle_error_tools(name: str, arguments: dict, api) -> List[types.Text
             types.TextContent(
                 type="text", text=json.dumps({"error": f"Unknown error tool: {name}"})
             )
-        ] 
+        ]

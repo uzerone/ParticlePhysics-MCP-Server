@@ -291,11 +291,10 @@ async def example_advanced_measurements():
 
     # Get detailed mass measurements for electron
     print("Electron mass measurements:")
-    mass_data = await call_tool("get_mass_measurements", {
-        "particle_name": "electron",
-        "include_summary_values": True,
-        "units": "MeV"
-    })
+    mass_data = await call_tool(
+        "get_mass_measurements",
+        {"particle_name": "electron", "include_summary_values": True, "units": "MeV"},
+    )
 
     if "error" not in mass_data:
         print(f"  Particle: {mass_data['particle']}")
@@ -305,16 +304,17 @@ async def example_advanced_measurements():
                 if "error" not in sv:
                     print(f"  {i}. {sv['value_text']}")
                     if sv.get("converted_value"):
-                        print(f"     Converted: {sv['converted_value']} {sv['converted_units']}")
+                        print(
+                            f"     Converted: {sv['converted_value']} {sv['converted_units']}"
+                        )
                     print(f"     In Summary Table: {sv['in_summary_table']}")
 
     # Get lifetime measurements for muon
     print(f"\nMuon lifetime measurements:")
-    lifetime_data = await call_tool("get_lifetime_measurements", {
-        "particle_name": "muon",
-        "include_summary_values": True,
-        "units": "ns"
-    })
+    lifetime_data = await call_tool(
+        "get_lifetime_measurements",
+        {"particle_name": "muon", "include_summary_values": True, "units": "ns"},
+    )
 
     if "error" not in lifetime_data:
         if "summary_values" in lifetime_data:
@@ -322,20 +322,24 @@ async def example_advanced_measurements():
                 if "error" not in sv:
                     print(f"  {i}. {sv['value_text']}")
                     if sv.get("converted_value"):
-                        print(f"     Converted: {sv['converted_value']} {sv['converted_units']}")
+                        print(
+                            f"     Converted: {sv['converted_value']} {sv['converted_units']}"
+                        )
 
     # Unit conversion examples
     print(f"\nUnit conversion examples:")
     conversions = [
         {"value": 0.511, "from_units": "MeV", "to_units": "GeV"},
         {"value": 2.2e-6, "from_units": "s", "to_units": "ns"},
-        {"value": 938.272, "from_units": "MeV", "to_units": "kg"}
+        {"value": 938.272, "from_units": "MeV", "to_units": "kg"},
     ]
 
     for conv in conversions:
         result = await call_tool("convert_units", conv)
         if "error" not in result:
-            print(f"  {result['original_value']} {result['original_units']} = {result['converted_value']} {result['converted_units']}")
+            print(
+                f"  {result['original_value']} {result['original_units']} = {result['converted_value']} {result['converted_units']}"
+            )
 
 
 async def example_summary_values_analysis():
@@ -344,11 +348,10 @@ async def example_summary_values_analysis():
 
     # Get all summary values for proton
     print("Proton summary values (all properties):")
-    summary_data = await call_tool("get_summary_values", {
-        "particle_name": "proton",
-        "property_type": "all",
-        "summary_table_only": True
-    })
+    summary_data = await call_tool(
+        "get_summary_values",
+        {"particle_name": "proton", "property_type": "all", "summary_table_only": True},
+    )
 
     if "error" not in summary_data:
         for prop_type, values in summary_data["summary_values"].items():
@@ -363,10 +366,9 @@ async def example_summary_values_analysis():
 
     # Get property details for W boson mass
     print(f"\nW boson mass property details:")
-    prop_details = await call_tool("get_property_details", {
-        "particle_name": "W+",
-        "property_type": "mass"
-    })
+    prop_details = await call_tool(
+        "get_property_details", {"particle_name": "W+", "property_type": "mass"}
+    )
 
     if "error" not in prop_details:
         for i, prop in enumerate(prop_details["properties"][:1], 1):  # Just first one
@@ -378,7 +380,9 @@ async def example_summary_values_analysis():
                 if "best_summary" in prop:
                     best = prop["best_summary"]
                     print(f"    Best value: {best['value_text']}")
-                    print(f"    Error: +{best.get('error_positive', 'N/A')} -{best.get('error_negative', 'N/A')}")
+                    print(
+                        f"    Error: +{best.get('error_positive', 'N/A')} -{best.get('error_negative', 'N/A')}"
+                    )
 
 
 async def example_pdg_metadata_exploration():
@@ -399,7 +403,7 @@ async def example_pdg_metadata_exploration():
     if "error" not in data_types_result:
         keys_text = data_types_result["data_type_keys"]
         # Show first few lines only
-        lines = keys_text.split('\n')[:6]
+        lines = keys_text.split("\n")[:6]
         for line in lines:
             print(f"  {line}")
         print("  ...")
@@ -417,10 +421,9 @@ async def example_pdg_metadata_exploration():
 
     # Get all identifiers for mass measurements (limited sample)
     print(f"\nMass-type PDG identifiers (sample):")
-    identifiers_result = await call_tool("get_all_pdg_identifiers", {
-        "data_type_key": "M",
-        "limit": 5
-    })
+    identifiers_result = await call_tool(
+        "get_all_pdg_identifiers", {"data_type_key": "M", "limit": 5}
+    )
     if "error" not in identifiers_result:
         print(f"  Found {identifiers_result['count']} identifiers:")
         for identifier in identifiers_result["identifiers"]:
@@ -429,11 +432,9 @@ async def example_pdg_metadata_exploration():
 
     # Search for particles by name pattern
     print(f"\nParticles with 'pi' in their names:")
-    particles_result = await call_tool("get_particles_by_name", {
-        "name": "pi",
-        "case_sensitive": False,
-        "limit": 3
-    })
+    particles_result = await call_tool(
+        "get_particles_by_name", {"name": "pi", "case_sensitive": False, "limit": 3}
+    )
     if "error" not in particles_result:
         print(f"  Found {particles_result['count']} particles:")
         for particle in particles_result["particles"]:
@@ -442,16 +443,18 @@ async def example_pdg_metadata_exploration():
 
     # Get specific PDG object by identifier
     print(f"\nStandard Model PDG entry (S008):")
-    pdg_obj_result = await call_tool("get_pdg_by_identifier", {
-        "pdgid": "S008"
-    })
+    pdg_obj_result = await call_tool("get_pdg_by_identifier", {"pdgid": "S008"})
     if "error" not in pdg_obj_result:
         print(f"  Type: {pdg_obj_result['object_type']}")
         print(f"  Description: {pdg_obj_result.get('description', 'N/A')}")
         if "content" in pdg_obj_result:
             content = pdg_obj_result["content"]
             # Show first 100 characters
-            print(f"  Content: {content[:100]}..." if len(content) > 100 else f"  Content: {content}")
+            print(
+                f"  Content: {content[:100]}..."
+                if len(content) > 100
+                else f"  Content: {content}"
+            )
 
 
 async def main():
@@ -460,17 +463,17 @@ async def main():
     print("These examples demonstrate various research scenarios")
     print("using the PDG particle physics database.\n")
 
+
 async def example_advanced_decay_analysis():
     """Example 12: Advanced decay analysis using PDG decay module."""
     print_example_header("Advanced Decay Analysis")
 
     # Get detailed decay products for tau
     print("Tau decay products with detailed information:")
-    decay_products = await call_tool("get_decay_products", {
-        "particle_name": "tau-",
-        "decay_type": "exclusive",
-        "include_subdecays": True
-    })
+    decay_products = await call_tool(
+        "get_decay_products",
+        {"particle_name": "tau-", "decay_type": "exclusive", "include_subdecays": True},
+    )
 
     if "error" not in decay_products:
         print(f"Found {decay_products['total_modes']} decay modes:")
@@ -481,50 +484,57 @@ async def example_advanced_decay_analysis():
             print(f"     Products ({mode['num_products']}):")
             for product in mode["decay_products"]:
                 if "error" not in product:
-                    mult = f"{product['multiplier']}×" if product['multiplier'] > 1 else ""
+                    mult = (
+                        f"{product['multiplier']}×" if product["multiplier"] > 1 else ""
+                    )
                     print(f"       - {mult}{product['item_name']}")
 
     # Analyze decay structure for B meson
     print(f"\nB+ meson decay structure analysis:")
-    structure_analysis = await call_tool("analyze_decay_structure", {
-        "particle_name": "B+",
-        "max_depth": 2,
-        "decay_type": "exclusive"
-    })
+    structure_analysis = await call_tool(
+        "analyze_decay_structure",
+        {"particle_name": "B+", "max_depth": 2, "decay_type": "exclusive"},
+    )
 
     if "error" not in structure_analysis:
         print(f"Analyzed {structure_analysis['total_analyzed']} decay chains:")
-        for i, decay in enumerate(structure_analysis["decay_structure"][:2], 1):  # Show first 2
+        for i, decay in enumerate(
+            structure_analysis["decay_structure"][:2], 1
+        ):  # Show first 2
             print(f"\n  {i}. Depth {decay['depth']}: {decay['description']}")
             print(f"     BR: {decay['branching_fraction']}")
-            print(f"     Mode: {decay['mode_number']}, Subdecay: {decay['is_subdecay']}")
+            print(
+                f"     Mode: {decay['mode_number']}, Subdecay: {decay['is_subdecay']}"
+            )
             if decay.get("products"):
                 for product in decay["products"][:3]:  # First 3 products
-                    mult = f"{product['multiplier']}×" if product['multiplier'] > 1 else ""
+                    mult = (
+                        f"{product['multiplier']}×" if product["multiplier"] > 1 else ""
+                    )
                     print(f"     → {mult}{product['item_name']}")
 
     # Get decay mode details for kaon
     print(f"\nK+ decay mode details:")
-    mode_details = await call_tool("get_decay_mode_details", {
-        "particle_name": "K+",
-        "show_subdecays": True,
-        "limit": 4
-    })
+    mode_details = await call_tool(
+        "get_decay_mode_details",
+        {"particle_name": "K+", "show_subdecays": True, "limit": 4},
+    )
 
     if "error" not in mode_details:
         print(f"Found {mode_details['total_modes']} decay modes:")
         for i, mode in enumerate(mode_details["decay_modes"], 1):
             print(f"  {i}. Mode {mode['mode_number']}: {mode['description']}")
             print(f"     BR: {mode['branching_fraction']}")
-            print(f"     Subdecay: {mode['is_subdecay']} (level {mode['subdecay_level']})")
+            print(
+                f"     Subdecay: {mode['is_subdecay']} (level {mode['subdecay_level']})"
+            )
             print(f"     Products: {mode['num_products']}")
 
     # Get branching ratios for D meson
     print(f"\nD+ branching ratios:")
-    ratios = await call_tool("get_branching_ratios", {
-        "particle_name": "D+",
-        "limit": 3
-    })
+    ratios = await call_tool(
+        "get_branching_ratios", {"particle_name": "D+", "limit": 3}
+    )
 
     if "error" not in ratios:
         print(f"Found {ratios['total_found']} branching ratios:")
@@ -532,7 +542,6 @@ async def example_advanced_decay_analysis():
             print(f"  {i}. {ratio['description']}")
             print(f"     Value: {ratio['display_value']}")
             print(f"     Associated with: {ratio['associated_bf_description']}")
-
 
     # List of example functions
     examples = [

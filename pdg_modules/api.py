@@ -10,8 +10,9 @@ This module contains tools that mirror the core PDG API functionality:
 """
 
 import json
-import mcp.types as types
 from typing import Any, Dict, List
+
+import mcp.types as types
 
 
 def get_api_tools() -> List[types.Tool]:
@@ -321,7 +322,7 @@ def format_particle_info(particle, include_basic=True, include_measurements=Fals
 
 async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextContent]:
     """Handle API-related tool calls."""
-    
+
     if name == "search_particle":
         query = arguments["query"]
         search_type = arguments.get("search_type", "auto")
@@ -355,9 +356,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
                         if hasattr(item, "name"):
                             results.append(format_particle_info(item))
                         else:
-                            results.append(
-                                {"pdgid": query, "description": str(item)}
-                            )
+                            results.append({"pdgid": query, "description": str(item)})
         except Exception as e:
             results.append({"error": f"Search failed: {str(e)}"})
 
@@ -465,9 +464,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
                 "limited_to": limit,
             }
 
-            return [
-                types.TextContent(type="text", text=json.dumps(result, indent=2))
-            ]
+            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [
                 types.TextContent(
@@ -529,9 +526,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
                             except:
                                 particle_info["lifetime"] = "N/A"
                         elif prop == "charge":
-                            particle_info["charge"] = getattr(
-                                particle, "charge", "N/A"
-                            )
+                            particle_info["charge"] = getattr(particle, "charge", "N/A")
                         elif prop == "spin":
                             try:
                                 particle_info["spin"] = str(
@@ -563,9 +558,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
                     )
 
             return [
-                types.TextContent(
-                    type="text", text=json.dumps(comparison, indent=2)
-                )
+                types.TextContent(type="text", text=json.dumps(comparison, indent=2))
             ]
         except Exception as e:
             return [
@@ -612,7 +605,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
 
         try:
             canonical_name = api.get_canonical_name(name)
-            
+
             result = {
                 "input_name": name,
                 "canonical_name": canonical_name,
@@ -639,20 +632,28 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
         try:
             particles = []
             count = 0
-            
-            for particle_list in api.get_particles_by_name(name, case_sensitive=case_sensitive, edition=edition):
+
+            for particle_list in api.get_particles_by_name(
+                name, case_sensitive=case_sensitive, edition=edition
+            ):
                 if count >= limit:
                     break
-                    
+
                 # Handle both single particles and particle lists
-                if hasattr(particle_list, '__iter__') and not isinstance(particle_list, str):
+                if hasattr(particle_list, "__iter__") and not isinstance(
+                    particle_list, str
+                ):
                     for particle in particle_list:
                         if count >= limit:
                             break
-                        particles.append(format_particle_info(particle, include_basic=True))
+                        particles.append(
+                            format_particle_info(particle, include_basic=True)
+                        )
                         count += 1
                 else:
-                    particles.append(format_particle_info(particle_list, include_basic=True))
+                    particles.append(
+                        format_particle_info(particle_list, include_basic=True)
+                    )
                     count += 1
 
             result = {
@@ -679,7 +680,7 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
         try:
             editions_list = api.editions
             default_edition = api.default_edition
-            
+
             result = {
                 "available_editions": editions_list,
                 "default_edition": default_edition,
@@ -704,45 +705,49 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
 
         try:
             pdg_obj = api.get(pdgid, edition=edition)
-            
+
             # Format the object based on its type
             result = {
                 "pdgid": pdgid,
                 "edition": edition,
                 "object_type": type(pdg_obj).__name__,
             }
-            
+
             # Try to get common attributes
             try:
                 result["description"] = pdg_obj.description
             except:
                 pass
-                
+
             try:
                 result["data_type"] = pdg_obj.data_type
             except:
                 pass
-                
+
             try:
                 result["data_flags"] = pdg_obj.data_flags
             except:
                 pass
 
             # Handle different object types
-            if hasattr(pdg_obj, '__iter__') and not isinstance(pdg_obj, str):
+            if hasattr(pdg_obj, "__iter__") and not isinstance(pdg_obj, str):
                 # It's a list/iterator of objects
                 items = []
                 for item in list(pdg_obj)[:10]:  # Limit to first 10 items
                     try:
-                        if hasattr(item, 'name'):
+                        if hasattr(item, "name"):
                             # It's a particle
                             items.append(format_particle_info(item, include_basic=True))
                         else:
                             # Other object types
-                            items.append({
-                                "description": getattr(item, "description", str(item)),
-                                "type": type(item).__name__,
-                            })
+                            items.append(
+                                {
+                                    "description": getattr(
+                                        item, "description", str(item)
+                                    ),
+                                    "type": type(item).__name__,
+                                }
+                            )
                     except:
                         items.append({"error": "Could not format item"})
                 result["items"] = items
@@ -750,13 +755,17 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
             else:
                 # Single object
                 try:
-                    if hasattr(pdg_obj, 'name'):
+                    if hasattr(pdg_obj, "name"):
                         # It's a particle
-                        result["particle"] = format_particle_info(pdg_obj, include_basic=True)
-                    elif hasattr(pdg_obj, 'value'):
+                        result["particle"] = format_particle_info(
+                            pdg_obj, include_basic=True
+                        )
+                    elif hasattr(pdg_obj, "value"):
                         # It's a measurement/property
                         result["value"] = pdg_obj.value
-                        result["display_value"] = getattr(pdg_obj, "display_value_text", str(pdg_obj))
+                        result["display_value"] = getattr(
+                            pdg_obj, "display_value_text", str(pdg_obj)
+                        )
                     else:
                         # Other object type
                         result["content"] = str(pdg_obj)
@@ -784,11 +793,11 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
         try:
             identifiers = []
             count = 0
-            
+
             for item in api.get_all(data_type_key=data_type_key, edition=edition):
                 if count >= limit:
                     break
-                
+
                 try:
                     identifier_info = {
                         "pdgid": item.pdgid,
@@ -796,13 +805,13 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
                         "data_type": item.data_type,
                         "edition": getattr(item, "edition", edition),
                     }
-                    
+
                     # Try to get additional info
                     try:
                         identifier_info["data_flags"] = item.data_flags
                     except:
                         pass
-                        
+
                     identifiers.append(identifier_info)
                     count += 1
                 except Exception as e:
@@ -834,4 +843,4 @@ async def handle_api_tools(name: str, arguments: dict, api) -> List[types.TextCo
             types.TextContent(
                 type="text", text=json.dumps({"error": f"Unknown API tool: {name}"})
             )
-        ] 
+        ]

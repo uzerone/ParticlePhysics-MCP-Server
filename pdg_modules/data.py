@@ -6,8 +6,9 @@ unit conversions, and property details.
 """
 
 import json
-import mcp.types as types
 from typing import Any, Dict, List
+
+import mcp.types as types
 
 
 def get_data_tools() -> List[types.Tool]:
@@ -29,7 +30,7 @@ def get_data_tools() -> List[types.Tool]:
                         "description": "Include summary values from PDG tables",
                     },
                     "include_measurements": {
-                        "type": "boolean", 
+                        "type": "boolean",
                         "default": False,
                         "description": "Include individual measurements",
                     },
@@ -72,7 +73,7 @@ def get_data_tools() -> List[types.Tool]:
             },
         ),
         types.Tool(
-            name="get_width_measurements", 
+            name="get_width_measurements",
             description="Get detailed width measurements and summary values for a particle",
             inputSchema={
                 "type": "object",
@@ -173,7 +174,7 @@ def get_data_tools() -> List[types.Tool]:
                         "description": "Source units (e.g., 'GeV', 'MeV', 's', 'ns')",
                     },
                     "to_units": {
-                        "type": "string", 
+                        "type": "string",
                         "description": "Target units (e.g., 'GeV', 'MeV', 's', 'ns')",
                     },
                 },
@@ -275,7 +276,6 @@ def get_data_tools() -> List[types.Tool]:
                 "required": ["table_name", "column_name", "key"],
             },
         ),
-
     ]
 
 
@@ -283,10 +283,10 @@ def format_summary_value(summary_value):
     """Format a PdgSummaryValue object for JSON output."""
     try:
         result = {}
-        
+
         # Core value information with safe access
         result["value"] = getattr(summary_value, "value", None)
-        
+
         # Try different attribute names for value text
         for attr in ["value_text", "display_value_text", "text", "display_text"]:
             if hasattr(summary_value, attr):
@@ -294,15 +294,17 @@ def format_summary_value(summary_value):
                 break
         else:
             result["value_text"] = str(getattr(summary_value, "value", "N/A"))
-        
+
         # Display value text with fallback
-        result["display_value_text"] = getattr(summary_value, "display_value_text", result["value_text"])
-        
+        result["display_value_text"] = getattr(
+            summary_value, "display_value_text", result["value_text"]
+        )
+
         # Error information
         result["error_positive"] = getattr(summary_value, "error_positive", None)
         result["error_negative"] = getattr(summary_value, "error_negative", None)
         result["error"] = getattr(summary_value, "error", None)
-        
+
         # Units and properties
         result["units"] = getattr(summary_value, "units", "N/A")
         result["is_limit"] = getattr(summary_value, "is_limit", False)
@@ -311,13 +313,13 @@ def format_summary_value(summary_value):
         result["confidence_level"] = getattr(summary_value, "confidence_level", None)
         result["scale_factor"] = getattr(summary_value, "scale_factor", None)
         result["comment"] = getattr(summary_value, "comment", None)
-        
+
         # Summary table information
         result["in_summary_table"] = getattr(summary_value, "in_summary_table", False)
         result["value_type"] = getattr(summary_value, "value_type", "N/A")
         result["value_type_key"] = getattr(summary_value, "value_type_key", "N/A")
         result["pdgid"] = getattr(summary_value, "pdgid", "N/A")
-        
+
         return result
     except Exception as e:
         return {"error": f"Failed to format summary value: {str(e)}"}
@@ -330,7 +332,7 @@ def format_measurement(measurement):
             "id": getattr(measurement, "id", "N/A"),
             "pdgid": getattr(measurement, "pdgid", "N/A"),
         }
-        
+
         # Try to get measurement value
         try:
             if hasattr(measurement, "get_value") and measurement.get_value():
@@ -344,7 +346,7 @@ def format_measurement(measurement):
                 }
         except:
             formatted["value"] = "N/A"
-            
+
         # Try to get reference information
         try:
             if hasattr(measurement, "reference") and measurement.reference:
@@ -358,7 +360,7 @@ def format_measurement(measurement):
                 }
         except:
             formatted["reference"] = "N/A"
-            
+
         return formatted
     except Exception as e:
         return {"error": f"Failed to format measurement: {str(e)}"}
@@ -374,13 +376,13 @@ def format_property_details(prop):
             "data_flags": prop.data_flags,
             "edition": prop.edition,
         }
-        
+
         # Get parent information
         try:
             details["parent_pdgid"] = prop.get_parent_pdgid()
         except:
             details["parent_pdgid"] = "N/A"
-            
+
         # Get best summary if available
         try:
             if prop.has_best_summary():
@@ -388,13 +390,13 @@ def format_property_details(prop):
                 details["best_summary"] = format_summary_value(best)
         except:
             pass
-            
+
         # Get number of summary values
         try:
             details["n_summary_values"] = prop.n_summary_table_values()
         except:
             details["n_summary_values"] = 0
-            
+
         return details
     except Exception as e:
         return {"error": f"Failed to format property details: {str(e)}"}
@@ -415,10 +417,9 @@ def get_property_by_type(particle, property_type):
         return []
 
 
-
 async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextContent]:
     """Handle data-related tool calls."""
-    
+
     if name == "get_mass_measurements":
         particle_name = arguments["particle_name"]
         include_summary_values = arguments.get("include_summary_values", True)
@@ -435,7 +436,11 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     for summary in mass_prop.summary_values():
                         sv_data = format_summary_value(summary)
                         # Convert units if requested
-                        if units != "GeV" and "value" in sv_data and sv_data["value"] is not None:
+                        if (
+                            units != "GeV"
+                            and "value" in sv_data
+                            and sv_data["value"] is not None
+                        ):
                             try:
                                 converted_value = summary.get_value(units)
                                 sv_data["converted_value"] = converted_value
@@ -452,7 +457,9 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                         measurements.append(format_measurement(measurement))
                 mass_data["measurements"] = measurements
 
-            return [types.TextContent(type="text", text=json.dumps(mass_data, indent=2))]
+            return [
+                types.TextContent(type="text", text=json.dumps(mass_data, indent=2))
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -472,7 +479,11 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
 
         try:
             particle = api.get_particle_by_name(particle_name)
-            lifetime_data = {"particle": particle_name, "property": "lifetime", "units": units}
+            lifetime_data = {
+                "particle": particle_name,
+                "property": "lifetime",
+                "units": units,
+            }
 
             if include_summary_values:
                 summary_values = []
@@ -480,7 +491,11 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     for summary in lifetime_prop.summary_values():
                         sv_data = format_summary_value(summary)
                         # Convert units if requested
-                        if units != "s" and "value" in sv_data and sv_data["value"] is not None:
+                        if (
+                            units != "s"
+                            and "value" in sv_data
+                            and sv_data["value"] is not None
+                        ):
                             try:
                                 converted_value = summary.get_value(units)
                                 sv_data["converted_value"] = converted_value
@@ -497,7 +512,9 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                         measurements.append(format_measurement(measurement))
                 lifetime_data["measurements"] = measurements
 
-            return [types.TextContent(type="text", text=json.dumps(lifetime_data, indent=2))]
+            return [
+                types.TextContent(type="text", text=json.dumps(lifetime_data, indent=2))
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -517,7 +534,11 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
 
         try:
             particle = api.get_particle_by_name(particle_name)
-            width_data = {"particle": particle_name, "property": "width", "units": units}
+            width_data = {
+                "particle": particle_name,
+                "property": "width",
+                "units": units,
+            }
 
             if include_summary_values:
                 summary_values = []
@@ -525,7 +546,11 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     for summary in width_prop.summary_values():
                         sv_data = format_summary_value(summary)
                         # Convert units if requested
-                        if units != "GeV" and "value" in sv_data and sv_data["value"] is not None:
+                        if (
+                            units != "GeV"
+                            and "value" in sv_data
+                            and sv_data["value"] is not None
+                        ):
                             try:
                                 converted_value = summary.get_value(units)
                                 sv_data["converted_value"] = converted_value
@@ -542,7 +567,9 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                         measurements.append(format_measurement(measurement))
                 width_data["measurements"] = measurements
 
-            return [types.TextContent(type="text", text=json.dumps(width_data, indent=2))]
+            return [
+                types.TextContent(type="text", text=json.dumps(width_data, indent=2))
+            ]
         except Exception as e:
             return [
                 types.TextContent(
@@ -564,15 +591,25 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
             particle = api.get_particle_by_name(particle_name)
             result = {"particle": particle_name, "summary_values": {}}
 
-            property_types = ["mass", "lifetime", "width"] if property_type == "all" else [property_type]
+            property_types = (
+                ["mass", "lifetime", "width"]
+                if property_type == "all"
+                else [property_type]
+            )
 
             for prop_type in property_types:
                 result["summary_values"][prop_type] = []
                 for prop in get_property_by_type(particle, prop_type):
-                    for summary in prop.summary_values(summary_table_only=summary_table_only):
+                    for summary in prop.summary_values(
+                        summary_table_only=summary_table_only
+                    ):
                         sv_data = format_summary_value(summary)
                         # Convert units if requested
-                        if units and "value" in sv_data and sv_data["value"] is not None:
+                        if (
+                            units
+                            and "value" in sv_data
+                            and sv_data["value"] is not None
+                        ):
                             try:
                                 converted_value = summary.get_value(units)
                                 sv_data["converted_value"] = converted_value
@@ -639,8 +676,9 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
         try:
             # Use PDG units module for conversion
             from pdg.units import convert
+
             converted_value = convert(value, from_units, to_units)
-            
+
             result = {
                 "original_value": value,
                 "original_units": from_units,
@@ -669,7 +707,7 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
             # Try to get as text object first
             try:
                 text_obj = api.get(pdgid)
-                if hasattr(text_obj, '__iter__'):
+                if hasattr(text_obj, "__iter__"):
                     text_obj = list(text_obj)[0]
             except:
                 # Try as particle name
@@ -681,7 +719,9 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     return [
                         types.TextContent(
                             type="text",
-                            text=json.dumps({"error": f"Could not find text for: {pdgid}"}, indent=2),
+                            text=json.dumps(
+                                {"error": f"Could not find text for: {pdgid}"}, indent=2
+                            ),
                         )
                     ]
 
@@ -749,20 +789,23 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
 
         try:
             data_types = api.doc_data_type_keys(as_text=as_text)
-            
+
             if as_text:
                 result = {"data_type_keys": data_types}
             else:
                 # Convert RowMapping objects to dict for JSON serialization
                 serializable_types = []
                 for dt in data_types:
-                    if hasattr(dt, '_mapping'):
+                    if hasattr(dt, "_mapping"):
                         serializable_types.append(dict(dt._mapping))
-                    elif hasattr(dt, 'keys'):
+                    elif hasattr(dt, "keys"):
                         serializable_types.append(dict(dt))
                     else:
                         serializable_types.append(str(dt))
-                result = {"data_type_keys": serializable_types, "count": len(serializable_types)}
+                result = {
+                    "data_type_keys": serializable_types,
+                    "count": len(serializable_types),
+                }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
@@ -781,20 +824,23 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
 
         try:
             value_types = api.doc_value_type_keys(as_text=as_text)
-            
+
             if as_text:
                 result = {"value_type_keys": value_types}
             else:
                 # Convert RowMapping objects to dict for JSON serialization
                 serializable_types = []
                 for vt in value_types:
-                    if hasattr(vt, '_mapping'):
+                    if hasattr(vt, "_mapping"):
                         serializable_types.append(dict(vt._mapping))
-                    elif hasattr(vt, 'keys'):
+                    elif hasattr(vt, "keys"):
                         serializable_types.append(dict(vt))
                     else:
                         serializable_types.append(str(vt))
-                result = {"value_type_keys": serializable_types, "count": len(serializable_types)}
+                result = {
+                    "value_type_keys": serializable_types,
+                    "count": len(serializable_types),
+                }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
@@ -815,7 +861,7 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
 
         try:
             doc = api.doc_key_value(table_name, column_name, key)
-            
+
             result = {
                 "table_name": table_name,
                 "column_name": column_name,
@@ -840,4 +886,4 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
             types.TextContent(
                 type="text", text=json.dumps({"error": f"Unknown data tool: {name}"})
             )
-        ] 
+        ]
