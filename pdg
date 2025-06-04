@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# PDG CLI Wrapper Script
+# Simple wrapper around pdg_cli.py for convenience
+
+python pdg_cli.py "$@" 
