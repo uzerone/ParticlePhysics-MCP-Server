@@ -888,7 +888,7 @@ Examples:
     parser.add_argument("--has-mass", action="store_true", help="Filter particles with mass")
     parser.add_argument("--has-lifetime", action="store_true", help="Filter particles with lifetime")
     parser.add_argument("--has-width", action="store_true", help="Filter particles with width")
-    parser.add_argument("--data-type-filter", help="Data type filter (% for all)")
+    parser.add_argument("--data-type-filter", help="Data type filter (%% for all)")
     parser.add_argument("--require-summary", action="store_true", default=True,
                        help="Require summary data")
     parser.add_argument("--in-summary-table", action="store_true", 
