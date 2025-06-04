@@ -6,9 +6,9 @@ A comprehensive **Model Context Protocol (MCP) server** providing seamless acces
 
 - **64 MCP Tools** across **8 specialized modules**
 - **Complete PDG API Coverage** with modular organization
-- **Multiple Installation Methods**: uvx, Docker, pip, or direct
+- **Multiple Installation Methods**: uvx, pip, or direct
 - **CLI Interface** for terminal usage
-- **Production Ready** with Docker support
+- **Production Ready** with comprehensive testing
 - **Python 3.10+** required (MCP dependency)
 
 ## 📦 Quick Installation
@@ -18,19 +18,20 @@ A comprehensive **Model Context Protocol (MCP) server** providing seamless acces
 uvx --from git+https://github.com/uzerone/PDG-MCP-Server.git pdg-mcp-server
 ```
 
-### Option 2: Docker
-```bash
-git clone https://github.com/uzerone/PDG-MCP-Server.git
-cd PDG-MCP-Server
-./docker-run.sh build && ./docker-run.sh run
-```
-
-### Option 3: Python/pip
+### Option 2: Direct Python/pip
 ```bash
 git clone https://github.com/uzerone/PDG-MCP-Server.git
 cd PDG-MCP-Server
 pip install -r requirements.txt
 python pdg_mcp_server.py
+```
+
+### Option 3: Development Setup
+```bash
+git clone https://github.com/uzerone/PDG-MCP-Server.git
+cd PDG-MCP-Server
+pip install -r requirements.txt
+python test_modular.py  # Run tests
 ```
 
 ## 🛠️ MCP Configuration
@@ -47,7 +48,6 @@ Add to your MCP client configuration:
   }
 }
 ```
-
 
 ## 💬 Example Queries for AI Assistants
 
@@ -152,9 +152,8 @@ python test_modular.py
 python pdg_cli.py search pi+
 python pdg_cli.py quantum-numbers --particle proton
 
-# Docker testing
-./docker-run.sh test
-./docker-run.sh examples
+# Run examples
+python examples.py
 ```
 
 ## 📊 Complete Tool Reference
@@ -249,7 +248,6 @@ python pdg_cli.py quantum-numbers --particle proton
 | Proton | `p` | 2212 | 0.938272 | +1 |
 | Neutron | `n` | 2112 | 0.939565 | 0 |
 | Pion+ | `pi+` | 211 | 0.139570 | +1 |
-
 
 ## 📄 License
 

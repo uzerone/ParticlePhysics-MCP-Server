@@ -44,24 +44,6 @@ jobs:
       run: |
         python examples.py || true  # Allow failure for API connectivity
 
-  docker:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build Docker image
-      run: |
-        docker build -t pdg-mcp-server:test .
-    
-    - name: Test Docker image
-      run: |
-        docker run --rm pdg-mcp-server:test python -c "import mcp.types; import pdg; print('✓ Docker image working')"
-    
-    - name: Test CLI in Docker
-      run: |
-        docker run --rm -v "$(pwd)/pdg_cli.py:/app/pdg_cli.py" pdg-mcp-server:test python pdg_cli.py --help
-
   lint:
     runs-on: ubuntu-latest
     

@@ -143,9 +143,6 @@ pdg_data/
 .DS_Store
 Thumbs.db
 
-# Docker
-.dockerignore
-
 # Temporary files
 *.tmp
 *.temp
