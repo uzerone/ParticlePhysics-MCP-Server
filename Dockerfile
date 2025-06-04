@@ -35,17 +35,19 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy application files
 COPY pdg_mcp_server.py .
-COPY test_pdg_server.py .
+COPY pdg_cli.py .
+COPY test_modular.py .
 COPY examples.py .
 COPY setup.py .
 COPY README.md .
 COPY LICENSE .
+COPY pdg_modules/ ./pdg_modules/
 
 # Create data directory for PDG database
 RUN mkdir -p $PDG_DATA_DIR
 
 # Make scripts executable
-RUN chmod +x pdg_mcp_server.py test_pdg_server.py examples.py
+RUN chmod +x pdg_mcp_server.py pdg_cli.py test_modular.py examples.py
 
 # Change ownership to non-root user
 RUN chown -R pdguser:pdguser $PDG_MCP_HOME
@@ -68,6 +70,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 CMD ["python", "pdg_mcp_server.py"]
 
 # Alternative commands can be:
-# CMD ["python", "test_pdg_server.py"]  # Run tests
+# CMD ["python", "test_modular.py"]     # Run tests
 # CMD ["python", "examples.py"]         # Run examples
 # CMD ["bash"]                          # Interactive shell 

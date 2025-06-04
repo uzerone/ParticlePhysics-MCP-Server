@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include requirements.txt
+include *.py
+recursive-include pdg_modules *.py
+include pdg_modules/__init__.py 

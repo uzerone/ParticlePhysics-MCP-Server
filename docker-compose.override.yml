@@ -2,17 +2,17 @@
 # This file is automatically used by docker-compose for development purposes
 # It enables hot-reloading by mounting source code as volumes
 
-version: '3.8'
-
 services:
   pdg-mcp-server:
     # Override volumes for development
     volumes:
       # Mount source code for hot-reloading during development
       - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
-      - ./test_pdg_server.py:/app/test_pdg_server.py
+      - ./pdg_cli.py:/app/pdg_cli.py
+      - ./test_modular.py:/app/test_modular.py
       - ./examples.py:/app/examples.py
       - ./requirements.txt:/app/requirements.txt
+      - ./pdg_modules:/app/pdg_modules
       
       # Keep data persistence
       - pdg_data:/app/data
@@ -33,8 +33,10 @@ services:
   pdg-mcp-test:
     volumes:
       - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
-      - ./test_pdg_server.py:/app/test_pdg_server.py
+      - ./pdg_cli.py:/app/pdg_cli.py
+      - ./test_modular.py:/app/test_modular.py
       - ./examples.py:/app/examples.py
+      - ./pdg_modules:/app/pdg_modules
       - pdg_data:/app/data
     
     environment:
@@ -44,7 +46,9 @@ services:
   pdg-mcp-examples:
     volumes:
       - ./pdg_mcp_server.py:/app/pdg_mcp_server.py
+      - ./pdg_cli.py:/app/pdg_cli.py
       - ./examples.py:/app/examples.py
+      - ./pdg_modules:/app/pdg_modules
       - pdg_data:/app/data
     
     environment:

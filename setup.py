@@ -22,7 +22,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/uzerone/pdg-mcp-server",
-    py_modules=["pdg_mcp_server"],
+    packages=find_packages(),
+    py_modules=["pdg_mcp_server", "pdg_cli", "examples", "test_modular"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
@@ -38,6 +39,7 @@ setup(
     entry_points={
         "console_scripts": [
             "pdg-mcp-server=pdg_mcp_server:run_server",
+            "pdg-cli=pdg_cli:main",
         ],
     },
     keywords="particle physics, PDG, MCP, research, data",

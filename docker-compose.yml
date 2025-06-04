@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   pdg-mcp-server:
     build:
@@ -18,10 +16,6 @@ services:
     volumes:
       # Persist PDG data between container restarts
       - pdg_data:/app/data
-      # Optional: Mount source code for development (uncomment for dev mode)
-      # - ./mcp.py:/app/mcp.py
-      # - ./test_pdg_server.py:/app/test_pdg_server.py
-      # - ./examples.py:/app/examples.py
     
     # Network configuration
     networks:
@@ -67,7 +61,7 @@ services:
     networks:
       - pdg-network
     
-    command: ["python", "test_pdg_server.py"]
+    command: ["python", "test_modular.py"]
 
   # Optional: PDG MCP Server for examples
   pdg-mcp-examples:

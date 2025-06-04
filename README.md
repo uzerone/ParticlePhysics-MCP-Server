@@ -1,37 +1,28 @@
 # PDG MCP Server
 
-A powerful **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). Perfect for researchers, students, and AI assistants working with particle physics.
+A comprehensive **Model Context Protocol (MCP) server** providing seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). Perfect for researchers, students, and AI assistants working with particle physics.
 
 ## 🚀 Features
 
-- **7 MCP Tools** for comprehensive particle physics research
+- **64 MCP Tools** across **8 specialized modules**
+- **Complete PDG API Coverage** with modular organization
 - **Multiple Installation Methods**: uvx, Docker, pip, or direct
-- **CLI Interface** for terminal usage  
-- **Comprehensive Testing** suite included
+- **CLI Interface** for terminal usage
 - **Production Ready** with Docker support
 - **Python 3.10+** required (MCP dependency)
 
----
-
-## 📦 Installation
+## 📦 Quick Installation
 
 ### Option 1: uvx (Recommended)
 ```bash
-# From GitHub (latest)
 uvx --from git+https://github.com/uzerone/PDG-MCP-Server.git pdg-mcp-server
-
-# From local clone  
-git clone https://github.com/uzerone/PDG-MCP-Server.git
-cd PDG-MCP-Server
-uvx --from . pdg-mcp-server
 ```
 
 ### Option 2: Docker
 ```bash
 git clone https://github.com/uzerone/PDG-MCP-Server.git
 cd PDG-MCP-Server
-./docker-run.sh build
-./docker-run.sh run
+./docker-run.sh build && ./docker-run.sh run
 ```
 
 ### Option 3: Python/pip
@@ -42,20 +33,10 @@ pip install -r requirements.txt
 python pdg_mcp_server.py
 ```
 
-### Option 4: Direct Terminal CLI
-```bash
-git clone https://github.com/uzerone/PDG-MCP-Server.git
-cd PDG-MCP-Server
-./pdg search --query "electron"  # Requires Docker
-```
-
----
-
 ## 🛠️ MCP Configuration
 
 Add to your MCP client configuration:
 
-### uvx Method
 ```json
 {
   "mcpServers": {
@@ -67,327 +48,225 @@ Add to your MCP client configuration:
 }
 ```
 
-### Docker Method  
-```json
-{
-  "mcpServers": {
-    "pdg": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "pdg-mcp-server:latest"]
-    }
-  }
-}
+## 📊 Modular Architecture
+
+The server is organized into **8 specialized modules** with **64 total tools**:
+
+| Module | Tools | Description |
+|--------|-------|-------------|
+| **API** | 11 | Core particle search, properties, comparison |
+| **Data** | 11 | Data handling, unit conversion, summary values |
+| **Decay** | 5 | Branching fractions, decay analysis |
+| **Error** | 4 | Error handling, validation, diagnostics |
+| **Measurement** | 8 | PDG measurement objects and analysis |
+| **Particle** | 10 | PDG particle objects and quantum numbers |
+| **Units** | 7 | Physics unit conversions and constants |
+| **Utils** | 8 | PDG utility functions and data processing |
+
+### 🔧 Module Organization
+
 ```
-
----
-
-## 🔧 Available MCP Tools
-
-| Tool | Description | Use Case |
-|------|-------------|----------|
-| **search_particle** | Find particles by name, MCID, or PDG ID | `"Find information about the muon"` |
-| **get_particle_properties** | Get detailed particle properties | `"What is the mass of the proton?"` |
-| **get_branching_fractions** | Get decay modes and branching ratios | `"Show me tau decay modes"` |
-| **list_particles** | List particles by type | `"List all leptons"` |
-| **get_particle_by_mcid** | Lookup by Monte Carlo ID | `"Get particle with MCID 211"` |
-| **compare_particles** | Side-by-side particle comparison | `"Compare electron and muon"` |
-| **get_database_info** | Database metadata and info | `"What PDG database version?"` |
-
----
+pdg_modules/
+├── __init__.py          # Package initialization  
+├── api.py              # Core API functionality (11 tools)
+├── data.py             # Data handling and measurements (11 tools)
+├── decay.py            # Decay analysis and branching fractions (5 tools)
+├── errors.py           # Error handling and diagnostics (4 tools)
+├── measurement.py      # PDG measurement objects and analysis (8 tools)
+├── particle.py         # PDG particle objects and quantum numbers (10 tools)
+├── units.py            # Physics unit conversions and constants (7 tools)
+└── utils.py            # PDG utility functions and data processing (8 tools)
+```
 
 ## 💬 Example Queries for AI Assistants
 
-Ask your AI assistant (Claude, ChatGPT, etc.) with the MCP server:
-
-### Basic Queries
+### Basic Research
 - *"What is the mass of the proton?"*
 - *"Find information about the electron"*
-- *"Show me the properties of pi+"*
-
-### Research Queries  
-- *"What are the main decay modes of the tau lepton?"*
 - *"Compare the masses of all quarks"*
-- *"List all particles with charge +1"*
 
-### Analysis Queries
-- *"Which B meson decays involve J/psi?"*
-- *"Compare the lifetimes of charged and neutral kaons"*
-- *"What are the quantum numbers of the W boson?"*
+### Advanced Analysis
+- *"What are the main decay modes of the tau lepton?"*
+- *"Get electron mass measurements in MeV with error bars"*
+- *"Analyze the hierarchical structure of B+ meson decay chains"*
+- *"Compare quantum numbers of leptons"*
 
----
+### PDG Data & Utilities
+- *"Convert 0.511 MeV to GeV using PDG units"*
+- *"Parse PDG identifier S008/2024"*
+- *"Validate PDG identifier and suggest alternatives"*
+- *"Apply PDG rounding rules to experimental data"*
 
 ## 🖥️ Terminal CLI Usage
 
 ### Quick Commands
 ```bash
-# Particle search
-./pdg search --query "e-"                    # Electron by name
-./pdg search --query "211" --type mcid       # Pi+ by Monte Carlo ID
+# Basic particle operations
+./pdg search --query "e-"
+./pdg properties --particle "proton"
+./pdg mass-measurements --particle "electron" --units "MeV"
 
-# Properties and mass
-./pdg properties --particle "proton"         # Basic properties  
-./pdg properties --particle "tau-" --measurements  # With references
+# Advanced analysis
+./pdg decay-products --particle "tau-" --type exclusive
+./pdg quantum-numbers --particle "proton"
+./pdg convert-advanced --value 0.511 --from-units MeV --to-units GeV
 
-# Decay modes  
-./pdg decays --particle "tau-" --limit 10    # Tau decays
-./pdg decays --particle "B+" --type all      # All B+ decays
-
-# List and compare
-./pdg list --type lepton --limit 20          # List leptons
-./pdg compare --particles "e-" "mu-" "tau-"  # Compare leptons
-
-# Database info
-./pdg info                                   # PDG database details
+# Utilities
+./pdg parse-pdg-id --pdgid "S008/2024"
+./pdg find-best-property --particle proton --property-type mass
+./pdg validate --identifier S008 --check-data
 ```
 
-### Using uvx
-```bash
-# Test the server
-uvx --from . python test_pdg_server.py
+## 🔧 Key Tool Categories
 
-# Run CLI commands
-uvx --from . python pdg_cli.py search --query "proton"
-uvx --from . python pdg_cli.py decays --particle "tau-"
-```
+### Core Physics Tools
+- **search_particle** - Search by name, MCID, or PDG ID
+- **get_particle_properties** - Detailed particle properties
+- **get_mass_measurements** - Mass with error bars and units
+- **get_branching_fractions** - Decay modes and branching ratios
+- **get_particle_quantum_numbers** - Quantum numbers (J, P, C, G, I)
 
----
+### Data Analysis Tools
+- **convert_units_advanced** - Physics unit conversions with validation
+- **get_summary_values** - PDG summary table values
+- **analyze_decay_structure** - Hierarchical decay analysis
+- **compare_particles** - Side-by-side particle comparison
+- **get_measurements_by_property** - Individual measurements with references
 
-## 🐍 Python API Usage
+### Utility Tools
+- **parse_pdg_identifier** - Parse PDG IDs into components
+- **validate_pdg_identifier** - Validate and diagnose PDG IDs
+- **apply_pdg_rounding** - Apply PDG rounding rules
+- **safe_particle_lookup** - Safe lookup with error handling
 
-### Basic Example
+## 🐍 Python API Example
+
 ```python
 import asyncio
 import json
-import pdg_mcp_server as pdgmcp
+import pdg_mcp_server as pdg_server
 
-async def basic_example():
-    # Search for a particle
-    result = await pdgmcp.handle_call_tool('search_particle', {'query': 'electron'})
-    data = json.loads(result[0].text)
-    print(f"Found: {data[0]['name']} (mass: {data[0]['mass']})")
-    
-    # Get detailed properties
-    result = await pdgmcp.handle_call_tool('get_particle_properties', 
-                                         {'particle_name': 'proton'})
-    data = json.loads(result[0].text)
-    print(f"Proton mass: {data['mass']}, lifetime: {data['lifetime']}")
-
-asyncio.run(basic_example())
-```
-
-### Advanced Research Example
-```python
-import asyncio
-import json
-import pdg_mcp_server as pdgmcp
-
-async def research_workflow():
-    """Complete particle physics research workflow."""
-    
-    # 1. Compare lepton family
-    print("=== Lepton Family Comparison ===")
-    result = await pdgmcp.handle_call_tool('compare_particles', {
+async def research_example():
+    # Compare lepton masses
+    result = await pdg_server.handle_call_tool('compare_particles', {
         'particle_names': ['e-', 'mu-', 'tau-'],
         'properties': ['mass', 'lifetime', 'charge']
     })
-    leptons = json.loads(result[0].text)
+    data = json.loads(result[0].text)
     
-    for particle in leptons['particles']:
-        print(f"{particle['name']}: {particle['mass']}, τ={particle['lifetime']}")
+    for particle in data['particles']:
+        print(f"{particle['name']}: {particle['mass']}")
     
-    # 2. Study tau decays
-    print("\n=== Tau Decay Modes ===")
-    result = await pdgmcp.handle_call_tool('get_branching_fractions', {
+    # Get tau decay modes
+    result = await pdg_server.handle_call_tool('get_branching_fractions', {
         'particle_name': 'tau-',
         'decay_type': 'exclusive',
         'limit': 5
     })
     decays = json.loads(result[0].text)
     
-    for i, decay in enumerate(decays['decay_modes'], 1):
-        print(f"{i}. {decay['description']} ({decay['display_value']})")
-    
-    # 3. Monte Carlo ID lookup
-    print("\n=== Monte Carlo ID Lookup ===")
-    mcids = [11, 13, 15, 211, 2212]  # e-, mu-, tau-, pi+, proton
-    
-    for mcid in mcids:
-        result = await pdgmcp.handle_call_tool('get_particle_by_mcid', {'mcid': mcid})
-        particle = json.loads(result[0].text)
-        print(f"MCID {mcid}: {particle['name']} ({particle['mass']})")
+    for decay in decays['decay_modes']:
+        print(f"{decay['description']}: {decay['display_value']}")
 
-asyncio.run(research_workflow())
+asyncio.run(research_example())
 ```
 
-### Error Handling Example
-```python
-import asyncio
-import json
-import pdg_mcp_server as pdgmcp
+## 🧪 Testing & Development
 
-async def safe_particle_lookup(particle_name):
-    """Safely look up particle with error handling."""
-    try:
-        result = await pdgmcp.handle_call_tool('get_particle_properties', 
-                                             {'particle_name': particle_name})
-        data = json.loads(result[0].text)
-        
-        if 'error' in data:
-            print(f"Error: {data['error']}")
-            return None
-        
-        return {
-            'name': data['name'],
-            'mass': data.get('mass', 'Unknown'),
-            'charge': data.get('charge', 'Unknown')
-        }
-        
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        return None
-
-async def error_example():
-    # Valid particle
-    proton = await safe_particle_lookup('proton')
-    if proton:
-        print(f"✓ {proton['name']}: {proton['mass']}")
-    
-    # Invalid particle
-    invalid = await safe_particle_lookup('invalid_particle')
-    if not invalid:
-        print("✗ Particle not found")
-
-asyncio.run(error_example())
-```
-
-### Batch Processing Example
-```python
-import asyncio
-import json
-import pdg_mcp_server as pdgmcp
-
-async def batch_particle_analysis():
-    """Process multiple particles efficiently."""
-    
-    particles_of_interest = [
-        'electron', 'muon', 'tau-',
-        'pi+', 'pi-', 'K+', 'K-',
-        'proton', 'neutron'
-    ]
-    
-    results = []
-    
-    for particle in particles_of_interest:
-        try:
-            result = await pdgmcp.handle_call_tool('get_particle_properties', 
-                                                 {'particle_name': particle})
-            data = json.loads(result[0].text)
-            
-            if 'error' not in data:
-                results.append({
-                    'name': data['name'],
-                    'mass': data.get('mass', 'N/A'),
-                    'charge': data.get('charge', 'N/A'),
-                    'mcid': data.get('mcid', 'N/A')
-                })
-        except:
-            continue
-    
-    # Sort by mass
-    results.sort(key=lambda x: float(x['mass'].split()[0]) if 'GeV' in x['mass'] else 0)
-    
-    print("Particles sorted by mass:")
-    for particle in results:
-        print(f"{particle['name']:<10} {particle['mass']:<15} {particle['charge']:<5} MCID:{particle['mcid']}")
-
-asyncio.run(batch_particle_analysis())
-```
-
-### Custom Helper Functions
-```python
-import asyncio
-import json
-import pdg_mcp_server as pdgmcp
-
-class PDGHelper:
-    """Helper class for common PDG operations."""
-    
-    @staticmethod
-    async def get_mass(particle_name):
-        """Get particle mass in GeV."""
-        result = await pdgmcp.handle_call_tool('get_particle_properties', 
-                                             {'particle_name': particle_name})
-        data = json.loads(result[0].text)
-        return data.get('mass', 'Unknown') if 'error' not in data else None
-    
-    @staticmethod
-    async def find_by_charge(charge, particle_type='all', limit=10):
-        """Find particles with specific charge."""
-        result = await pdgmcp.handle_call_tool('list_particles', {
-            'particle_type': particle_type,
-            'limit': 100
-        })
-        data = json.loads(result[0].text)
-        
-        if 'error' in data:
-            return []
-        
-        filtered = [p for p in data['particles'] if p.get('charge') == charge]
-        return filtered[:limit]
-    
-    @staticmethod
-    async def mass_comparison(particles):
-        """Compare masses of multiple particles."""
-        result = await pdgmcp.handle_call_tool('compare_particles', {
-            'particle_names': particles,
-            'properties': ['mass']
-        })
-        data = json.loads(result[0].text)
-        return data['particles'] if 'error' not in data else []
-
-async def helper_example():
-    # Use helper functions
-    print("Electron mass:", await PDGHelper.get_mass('electron'))
-    
-    charged_particles = await PDGHelper.find_by_charge(1.0, 'meson', 5)
-    print("Charged mesons:", [p['name'] for p in charged_particles])
-    
-    mass_data = await PDGHelper.mass_comparison(['proton', 'neutron'])
-    for p in mass_data:
-        print(f"{p['name']}: {p.get('mass', 'N/A')}")
-
-asyncio.run(helper_example())
-```
-
----
-
-## 🧪 Testing
-
-### Run All Tests
 ```bash
-# Docker method
+# Run all tests
+python test_modular.py
+
+# Test specific functionality
+python pdg_cli.py search pi+
+python pdg_cli.py quantum-numbers --particle proton
+
+# Docker testing
 ./docker-run.sh test
-
-# uvx method  
-uvx --from . python test_pdg_server.py
-
-# Direct method
-python test_pdg_server.py
-```
-
-### Interactive Examples
-```bash
-# Docker
 ./docker-run.sh examples
-
-# uvx
-uvx --from . python examples.py
-
-# Direct
-python examples.py
 ```
 
----
+## 📊 Complete Tool Reference
+
+### API Module (11 tools)
+- `search_particle` - Search for particles by name, MCID, or PDG ID
+- `get_particle_properties` - Get detailed particle properties
+- `list_particles` - List particles by type with filtering
+- `get_particle_by_mcid` - Get particle by Monte Carlo ID
+- `compare_particles` - Compare multiple particles side-by-side
+- `get_database_info` - Get PDG database information
+- `get_canonical_name` - Get canonical particle names
+- `get_particles_by_name` - Search particles by name patterns
+- `get_editions` - List available PDG editions
+- `get_pdg_by_identifier` - Get particle by PDG identifier
+- `get_all_pdg_identifiers` - List all PDG identifiers
+
+### Data Module (11 tools)
+- `get_mass_measurements` - Mass measurements with errors and units
+- `get_lifetime_measurements` - Lifetime measurements with units
+- `get_width_measurements` - Width measurements for unstable particles
+- `get_summary_values` - PDG summary table values
+- `get_measurements_by_property` - Individual measurements with references
+- `convert_units` - Convert between physics units
+- `get_particle_text` - Get text descriptions and reviews
+- `get_property_details` - Detailed property information
+- `get_data_type_keys` - Available data type keys
+- `get_value_type_keys` - Available value type keys
+- `get_key_documentation` - Documentation for specific keys
+
+### Measurement Module (8 tools)
+- `get_measurement_details` - Detailed measurement information
+- `get_measurement_value_details` - Value details with error breakdown
+- `get_reference_details` - Publication reference information
+- `search_measurements_by_reference` - Search by publication criteria
+- `get_footnote_details` - Footnote text and references
+- `analyze_measurement_errors` - Error component analysis
+- `get_measurements_for_particle` - All measurements for a particle
+- `compare_measurement_techniques` - Compare measurement methods
+
+### Particle Module (10 tools)
+- `get_particle_quantum_numbers` - Quantum numbers (J, P, C, G, I)
+- `check_particle_properties` - Particle classification checks
+- `get_particle_list_by_criteria` - Filter particles by criteria
+- `get_particle_properties_detailed` - Comprehensive properties
+- `analyze_particle_item` - Analyze PDG items from descriptions
+- `get_particle_mass_details` - Detailed mass information
+- `get_particle_lifetime_details` - Detailed lifetime information
+- `get_particle_width_details` - Detailed width information
+- `compare_particle_quantum_numbers` - Compare quantum numbers
+- `get_particle_error_info` - Error information for properties
+
+### Units Module (7 tools)
+- `convert_units_advanced` - Advanced unit conversion with validation
+- `get_unit_conversion_factors` - Available conversion factors
+- `get_physics_constants` - Physics constants (ħ, c, etc.)
+- `validate_unit_compatibility` - Check unit compatibility
+- `get_unit_info` - Detailed unit information
+- `convert_between_natural_units` - Natural unit conversions
+- `get_common_conversions` - Common physics unit conversions
+
+### Utils Module (8 tools)
+- `parse_pdg_identifier` - Parse PDG IDs into components
+- `get_base_pdg_id` - Get base PDG identifier
+- `make_pdg_identifier` - Create normalized PDG identifiers
+- `find_best_property` - Find best property using PDG criteria
+- `apply_pdg_rounding` - Apply PDG rounding rules
+- `get_linked_data` - Get linked database data
+- `normalize_pdg_data` - Normalize and validate data
+- `get_pdg_table_data` - Access raw database tables
+
+### Decay Module (5 tools)
+- `get_branching_fractions` - Branching fractions (exclusive/inclusive)
+- `get_decay_products` - Decay products with subdecay support
+- `get_branching_ratios` - Branching ratios between modes
+- `get_decay_mode_details` - Detailed decay mode information
+- `analyze_decay_structure` - Hierarchical decay analysis
+
+### Error Module (4 tools)
+- `validate_pdg_identifier` - Validate PDG identifiers
+- `get_error_info` - Error type information
+- `diagnose_lookup_issues` - Diagnose lookup problems
+- `safe_particle_lookup` - Safe lookup with error handling
 
 ## 📊 Common Particle Reference
 
@@ -399,44 +278,48 @@ python examples.py
 | Proton | `p` | 2212 | 0.938272 | +1 |
 | Neutron | `n` | 2112 | 0.939565 | 0 |
 | Pion+ | `pi+` | 211 | 0.139570 | +1 |
-| Kaon+ | `K+` | 321 | 0.493677 | +1 |
 
----
-
-## 🚀 Docker Commands
+## 🐳 Docker Commands
 
 ```bash
 ./docker-run.sh build     # Build image
 ./docker-run.sh test      # Run tests  
 ./docker-run.sh examples  # Interactive examples
 ./docker-run.sh run       # Start server
-./docker-run.sh logs      # View logs
-./docker-run.sh cleanup   # Remove everything
 ./docker-run.sh shell     # Interactive shell
 ```
-
----
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
+2. Create feature branch: `git checkout -b feature/amazing-feature`
 3. Run tests: `./docker-run.sh test`  
 4. Commit changes: `git commit -m 'Add amazing feature'`
 5. Push to branch: `git push origin feature/amazing-feature`
-6. Open a Pull Request
+6. Open Pull Request
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+### Development Guidelines
 
----
+- **Choose appropriate module** based on functionality
+- **Follow module patterns** for tool definition and handling
+- **Update both server and CLI** implementations
+- **Add comprehensive tests** for new functionality
+- **Update documentation**
+
+## 📈 Benefits of Modular Architecture
+
+1. **Maintainability**: Clear separation of concerns across 8 modules
+2. **Extensibility**: Easy to add new modules or expand existing ones
+3. **Testability**: Module-specific testing strategies
+4. **Documentation**: Focused documentation per module
+5. **Reusability**: Modules can be imported independently
+6. **Collaboration**: Teams can work on different modules
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-**Note**: PDG data is subject to [PDG's own license terms](https://pdg.lbl.gov/about/terms). Starting with 2024 edition, published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-
----
+**Note**: PDG data is subject to [PDG's license terms](https://pdg.lbl.gov/about/terms). Starting with 2024 edition, published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## 🔗 Links
 
@@ -445,8 +328,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **MCP Protocol**: https://modelcontextprotocol.io/
 - **Repository**: https://github.com/uzerone/PDG-MCP-Server
 
----
-
 ## 👥 Authors
 
 - [@uzerone](https://github.com/uzerone) - Project maintainer
@@ -454,4 +335,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**🔬 Happy particle physics research!** ⚛️ 
+**🔬 Happy particle physics research!** ⚛️
+
+Built with the complete PDG API ecosystem: 8 modules, 64 tools, production-ready for particle physics research and analysis. 

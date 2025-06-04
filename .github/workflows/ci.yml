@@ -33,7 +33,7 @@ jobs:
     
     - name: Run tests
       run: |
-        python test_pdg_server.py
+        python test_modular.py
     
     - name: Test CLI
       run: |
