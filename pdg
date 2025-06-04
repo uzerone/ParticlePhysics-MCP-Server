@@ -1,8 +1,0 @@
-#!/bin/bash
-# PDG MCP Server CLI Convenience Wrapper
-# Usage: ./pdg search --query "electron"
-
-docker run --rm \
-  -v "$(pwd)/pdg_cli.py:/app/pdg_cli.py" \
-  pdg-mcp-server:latest \
-  python pdg_cli.py "$@" 
