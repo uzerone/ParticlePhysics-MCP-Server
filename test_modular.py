@@ -20,8 +20,16 @@ def test_module_imports():
     print("Testing module imports...")
 
     try:
-        from pdg_modules import (api, data, decay, errors, measurement,
-                                 particle, units, utils)
+        from pdg_modules import (
+            api,
+            data,
+            decay,
+            errors,
+            measurement,
+            particle,
+            units,
+            utils,
+        )
 
         print("✅ All modules imported successfully")
         return True
@@ -35,8 +43,16 @@ def test_tool_availability():
     print("\nTesting tool availability...")
 
     try:
-        from pdg_modules import (api, data, decay, errors, measurement,
-                                 particle, units, utils)
+        from pdg_modules import (
+            api,
+            data,
+            decay,
+            errors,
+            measurement,
+            particle,
+            units,
+            utils,
+        )
 
         modules = [
             ("api", api),
@@ -96,8 +112,16 @@ def test_tool_schemas():
     try:
         import mcp.types as types
 
-        from pdg_modules import (api, data, decay, errors, measurement,
-                                 particle, units, utils)
+        from pdg_modules import (
+            api,
+            data,
+            decay,
+            errors,
+            measurement,
+            particle,
+            units,
+            utils,
+        )
 
         modules = [api, data, decay, errors, measurement, particle, units, utils]
 
