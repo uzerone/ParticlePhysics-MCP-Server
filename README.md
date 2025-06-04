@@ -249,11 +249,69 @@ python examples.py
 | Neutron | `n` | 2112 | 0.939565 | 0 |
 | Pion+ | `pi+` | 211 | 0.139570 | +1 |
 
+## 📦 Dependencies & Licensing
+
+### Core Dependencies
+
+This project relies on several key dependencies, each with their own licensing terms:
+
+#### 🧬 PDG Python API (Primary Dependency)
+- **Package**: `pdg` - Python package for machine-readable access to PDG data
+- **Source**: Lawrence Berkeley National Laboratory (LBNL)
+- **Copyright**: © 2023, The Regents of the University of California, through Lawrence Berkeley National Laboratory
+- **License**: BSD-3-Clause-style License (LBNL)
+- **Repository**: https://github.com/particledatagroup/api
+- **Purpose**: Provides direct access to Particle Data Group database
+
+#### 🔧 MCP Framework
+- **Package**: `mcp` - Model Context Protocol implementation
+- **License**: MIT License
+- **Purpose**: Enables AI assistant integration via MCP protocol
+
+#### 🐍 Python Standard Dependencies
+- **asyncio**: Built-in Python async framework
+- **json**: Built-in JSON handling
+- **argparse**: Built-in command-line interface
+- **logging**: Built-in logging functionality
+
+### Development Dependencies
+- **typing**: Type hints support
+- **pathlib**: Modern path handling
+
+### License Compliance Summary
+
+| Component | License | Copyright Holder |
+|-----------|---------|------------------|
+| **PDG MCP Server** (this project) | MIT License | PDG MCP Server Contributors |
+| **PDG Python API** | BSD-3-Clause-style | UC Regents / LBNL |
+| **PDG Data** | CC BY 4.0 (2024+) | Particle Data Group |
+| **MCP Framework** | MIT License | Model Context Protocol Contributors |
+
+### 📋 Attribution Requirements
+
+1. **PDG Python API**: This software depends on the PDG Python API developed by Lawrence Berkeley National Laboratory. Full license terms are included in our [LICENSE](LICENSE) file.
+
+2. **PDG Data**: The particle physics data accessed through this server is provided by the Particle Data Group (PDG) and is subject to their licensing terms.
+
+3. **Installation**: The PDG Python API is automatically installed as a dependency when you install this package.
+
+### 🔒 License Compatibility
+
+All dependencies use permissive licenses that are compatible with each other:
+- MIT License (this project, MCP)
+- BSD-3-Clause-style (PDG Python API)  
+- CC BY 4.0 (PDG data)
+
+This ensures the entire software stack can be used together without licensing conflicts.
+
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for complete details including PDG Python API attribution.
 
-**Note**: PDG data is subject to [PDG's license terms](https://pdg.lbl.gov/about/terms). Starting with 2024 edition, published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+**Important**: This project includes multiple license components:
+- **PDG MCP Server code**: MIT License
+- **PDG Python API**: BSD-3-Clause-style License (LBNL)
+- **PDG Data**: CC BY 4.0 License (starting 2024 edition)
 
 ## 🔗 Links
 
