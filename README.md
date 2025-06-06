@@ -1,4 +1,4 @@
-# PDG MCP Server
+# Particle Physics MCP Server
 
 A **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). This server enables AI assistants and applications to query comprehensive particle physics information through 64 specialized tools.
 
@@ -87,15 +87,6 @@ python pdg_cli.py convert-units --value 1 --from-units MeV --to-units GeV
 | **Decay** | 5 | Branching fractions and decay analysis |
 | **Errors** | 4 | Error handling and diagnostics |
 
-## Common Particles Reference
-
-| Particle | Symbol | Mass (GeV) | Charge | Type |
-|----------|--------|------------|--------|------|
-| Electron | `e-` | 0.000511 | -1 | Lepton |
-| Muon | `mu-` | 0.106 | -1 | Lepton |
-| Proton | `p` | 0.938 | +1 | Baryon |
-| Neutron | `n` | 0.940 | 0 | Baryon |
-| Pion+ | `pi+` | 0.140 | +1 | Meson |
 
 ## Testing
 
@@ -110,11 +101,6 @@ python pdg_cli.py --help
 python -c "import pdg; print('✓ PDG API ready')"
 ```
 
-## Dependencies
-
-- **Python 3.10+** (required for MCP)
-- **PDG Python API** (automatically installed)
-- **MCP Framework** (for AI assistant integration)
 
 ## Maintainers
 
@@ -130,13 +116,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - PDG MCP Server: MIT License
 - PDG Python API: BSD-3-Clause License (Lawrence Berkeley National Laboratory)
 - PDG Data: CC BY 4.0 License (Particle Data Group)
-
-## Links
-
-- **PDG Website**: https://pdg.lbl.gov/
-- **PDG Python API**: https://github.com/particledatagroup/api  
-- **MCP Protocol**: https://modelcontextprotocol.io/
-- **Repository**: https://github.com/uzerone/PDG-MCP-Server
 
 ---
 

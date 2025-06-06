@@ -83,9 +83,3 @@ For complete PDG data licensing information, please visit:
 https://pdg.lbl.gov
 
 ---
-
-## Summary
-
-- **PDG MCP Server Code**: MIT License (this project)
-- **PDG Python API**: BSD-3-Clause-style License (Lawrence Berkeley National Laboratory)
-- **PDG Data**: CC BY 4.0 License (Particle Data Group) 
