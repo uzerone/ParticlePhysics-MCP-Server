@@ -2,9 +2,9 @@
 
 A **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). This production-ready server enables AI assistants and applications to query comprehensive particle physics information through 60 specialized tools across 8 modules with enterprise-grade security, caching, and performance features.
 
-## 🚀 One-Click Installation (No Local Setup Required!)
+## One-Click Installation (No Local Setup Required!)
 
-### For Claude Desktop Users:
+### For Claude Desktop/IDE Users:
 Simply add this to your `claude_desktop_config.json`:
 
 ```json
@@ -24,90 +24,6 @@ Simply add this to your `claude_desktop_config.json`:
 
 **That's it!** No local installation needed. The server will be automatically downloaded and run when needed.
 
-### Alternative Methods:
-- **Using pipx**: Replace `"command": "uvx"` with `"command": "pipx"` and `"args": ["run", "--spec", "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git", "pp-mcp-server"]`
-- **Download JSON Config**: Get our pre-configured [claude-desktop-quick.json](claude-desktop-quick.json) file
-
-📖 **[See QUICK_START.md for detailed setup instructions →](QUICK_START.md)**
-
-## Quick Installation
-
-### Option 1: Direct Python Script (Recommended for Local Development)
-```bash
-git clone https://github.com/uzerone/ParticlePhysics-MCP-Server.git
-cd ParticlePhysics-MCP-Server
-pip install -r requirements.txt
-```
-
-### Option 2: Development Installation
-```bash
-git clone https://github.com/uzerone/ParticlePhysics-MCP-Server.git
-cd ParticlePhysics-MCP-Server
-pip install -e .
-```
-
-## MCP Configuration for Claude Desktop
-
-Choose the configuration method that works best for your setup:
-
-### Method 1: Absolute Path (Most Reliable)
-Add this to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "particlephysics": {
-      "command": "python",
-      "args": ["/ABSOLUTE/PATH/TO/ParticlePhysics-MCP-Server/pp_mcp_server.py"]
-    }
-  }
-}
-```
-
-**Note**: Replace `/ABSOLUTE/PATH/TO/` with your actual path. For example:
-- macOS: `/Users/username/Documents/ParticlePhysics-MCP-Server/pp_mcp_server.py`
-- Windows: `C:\\Users\\username\\Documents\\ParticlePhysics-MCP-Server\\pp_mcp_server.py`
-- Linux: `/home/username/ParticlePhysics-MCP-Server/pp_mcp_server.py`
-
-### Method 2: Python Module (After Installation)
-If you've installed the package with `pip install -e .`:
-
-```json
-{
-  "mcpServers": {
-    "particlephysics": {
-      "command": "python",
-      "args": ["-m", "pp_mcp_server"]
-    }
-  }
-}
-```
-
-### Method 3: Working Directory Method
-```json
-{
-  "mcpServers": {
-    "particlephysics": {
-      "command": "python",
-      "args": ["pp_mcp_server.py"],
-      "cwd": "/ABSOLUTE/PATH/TO/ParticlePhysics-MCP-Server"
-    }
-  }
-}
-```
-
-## Configuration File Locations
-
-The Claude Desktop configuration file should be placed at:
-
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-After updating the configuration:
-1. Save the file
-2. Restart Claude Desktop
-3. Look for the tools icon in Claude to verify the server is connected
-
 ## Usage Examples
 
 ### Basic Particle Queries
@@ -122,6 +38,24 @@ After updating the configuration:
 - *"Compare quantum numbers of all leptons"*
 - *"Convert 0.511 MeV to GeV"*
 
+## Features
+
+### 60 Specialized Tools Across 8 Modules:
+- **Particle Search**: Find particles by name, ID, or properties
+- **Mass & Lifetime Data**: Get precise measurements with uncertainties
+- **Decay Analysis**: Explore decay modes and branching fractions
+- **Unit Conversion**: Convert between particle physics units
+- **Quantum Numbers**: Access spin, parity, and other quantum properties
+- **Error Handling**: Smart validation and helpful suggestions
+- **Database Access**: Direct PDG database integration
+- **Measurement Analysis**: Statistical analysis of experimental data
+
+### Enterprise Features:
+- **Caching**: Intelligent caching for fast response times
+- **Rate Limiting**: Built-in protection against API abuse
+- **Input Validation**: Comprehensive security and data validation
+- **Error Recovery**: Robust error handling with helpful suggestions
+- **Async Support**: High-performance asynchronous operations
 
 ## Maintainers
 
@@ -139,5 +73,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - PDG Data: CC BY 4.0 License (Particle Data Group)
 
 ---
-
-**Empowering AI assistants with particle physics knowledge**
