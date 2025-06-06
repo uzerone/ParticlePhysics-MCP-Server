@@ -1146,9 +1146,6 @@ async def handle_decay_tools(
                     )
                 ]
 
-        # Continue with other enhanced tool implementations...
-        # [Additional tools would be implemented here with similar enhancement patterns]
-
         else:
             error_response = {
                 "error": f"Unknown decay tool: {name}",

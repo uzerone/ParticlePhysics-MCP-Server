@@ -925,10 +925,10 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                                 if derived:
                                     sv_data["derived_quantities"] = derived
 
-                            summary_values.append(sv_data)
+                        summary_values.append(sv_data)
 
-                    mass_data["summary_values"] = summary_values
-                    mass_data["summary_count"] = len(summary_values)
+                mass_data["summary_values"] = summary_values
+                mass_data["summary_count"] = len(summary_values)
 
                 if include_measurements:
                     measurements = []
@@ -946,8 +946,8 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                                 f"Error getting measurements for mass property: {e}"
                             )
 
-                    mass_data["measurements"] = measurements
-                    mass_data["measurement_count"] = len(measurements)
+                mass_data["measurements"] = measurements
+                mass_data["measurement_count"] = len(measurements)
 
                 # Add statistical summary if multiple values exist
                 if (
@@ -973,7 +973,6 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                                 else 0
                             ),
                         }
-
                 return [
                     types.TextContent(type="text", text=json.dumps(mass_data, indent=2))
                 ]
@@ -1097,9 +1096,6 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     )
                 ]
 
-        # Continue with other enhanced tool implementations...
-        # [Additional tools would be implemented here with similar enhancement patterns]
-
         else:
             error_response = {
                 "error": f"Unknown data tool: {name}",
@@ -1135,3 +1131,4 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
         return [
             types.TextContent(type="text", text=json.dumps(error_response, indent=2))
         ]
+

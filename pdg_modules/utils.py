@@ -777,7 +777,7 @@ async def handle_utils_tools(
                         },
                     },
                     "edition_info": "Edition typically represents PDG Review year (e.g., 2024, 2022)",
-                }
+            }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
@@ -898,8 +898,8 @@ async def handle_utils_tools(
                     "pdgid": safe_get_attribute(best_prop, "pdgid", "N/A"),
                     "description": safe_get_attribute(best_prop, "description", "N/A"),
                     "display_value": safe_get_attribute(
-                        best_prop, "display_value_text", "N/A"
-                    ),
+                            best_prop, "display_value_text", "N/A"
+                        ),
                     "value": safe_get_attribute(best_prop, "value", "N/A"),
                     "units": safe_get_attribute(best_prop, "units", "N/A"),
                     "data_flags": safe_get_attribute(best_prop, "data_flags", "N/A"),

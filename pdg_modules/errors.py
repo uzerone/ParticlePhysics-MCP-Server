@@ -440,7 +440,7 @@ def generate_pdg_identifier_suggestions(
         return []
 
 
-def get_enhanced_pdg_error_info() -> Dict[str, Any]:
+def get_pdg_error_info() -> Dict[str, Any]:
     """Get comprehensive information about PDG error types with enhanced details."""
     return {
         "PdgApiError": {

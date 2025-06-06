@@ -699,6 +699,79 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
         return {"error": f"Failed to format classification: {str(e)}"}
 
 
+def format_particle_classification(particle: Any) -> Dict[str, Any]:
+    """Format particle classification information."""
+    try:
+        classification = {
+            "type": "unknown",
+            "category": "unknown",
+            "is_fundamental": False,
+            "is_composite": False,
+        }
+
+        # Check particle type flags
+        if safe_get_attribute(particle, "is_lepton", False):
+            classification.update(
+                {"type": "lepton", "category": "fundamental", "is_fundamental": True}
+            )
+        elif safe_get_attribute(particle, "is_quark", False):
+            classification.update(
+                {"type": "quark", "category": "fundamental", "is_fundamental": True}
+            )
+        elif safe_get_attribute(particle, "is_boson", False):
+            classification.update(
+                {"type": "boson", "category": "fundamental", "is_fundamental": True}
+            )
+        elif safe_get_attribute(particle, "is_baryon", False):
+            classification.update(
+                {
+                    "type": "baryon",
+                    "category": "hadron",
+                    "is_composite": True,
+                }
+            )
+        elif safe_get_attribute(particle, "is_meson", False):
+            classification.update(
+                {
+                    "type": "meson",
+                    "category": "hadron",
+                    "is_composite": True,
+                }
+            )
+
+        return classification
+    except Exception as e:
+        return {"error": f"Failed to classify particle: {str(e)}"}
+
+
+def format_quantum_numbers(particle: Any) -> Dict[str, Any]:
+    """Format quantum numbers for a particle."""
+    try:
+        quantum_numbers = {}
+
+        # Standard quantum number mappings
+        qn_mappings = {
+            "J": ("quantum_J", "Total angular momentum"),
+            "P": ("quantum_P", "Parity"),
+            "C": ("quantum_C", "Charge conjugation parity"),
+            "G": ("quantum_G", "G-parity"),
+            "I": ("quantum_I", "Isospin"),
+        }
+
+        for symbol, (attr, description) in qn_mappings.items():
+            value = safe_get_attribute(particle, attr)
+            if value is not None:
+                quantum_numbers[symbol] = {
+                    "value": str(value),
+                    "description": description,
+                    "symbol": symbol,
+                }
+
+        return quantum_numbers
+    except Exception as e:
+        return {"error": f"Failed to format quantum numbers: {str(e)}"}
+
+
 def format_particle_properties(particle, property_iter, include_measurements=False):
     """Format particle properties from an iterator."""
     properties = []

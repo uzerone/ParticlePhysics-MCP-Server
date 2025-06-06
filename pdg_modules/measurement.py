@@ -116,9 +116,14 @@ License: MIT (with PDG Python API dependencies under BSD-3-Clause)
 """
 
 import json
+import logging
+import math
 from typing import Any, Dict, List, Optional
 
 import mcp.types as types
+
+# Setup module logger
+logger = logging.getLogger(__name__)
 
 
 def get_measurement_tools() -> List[types.Tool]:
@@ -786,6 +791,26 @@ def format_enhanced_reference(
     except Exception as e:
         logger.error(f"Failed to format reference: {e}")
         return {"error": f"Failed to format reference: {str(e)}"}
+
+
+def format_pdg_measurement(measurement):
+    """Format a PdgMeasurement object for JSON output."""
+    try:
+        formatted = {
+            "id": getattr(measurement, "id", "N/A"),
+            "pdgid": getattr(measurement, "pdgid", "N/A"),
+            "event_count": getattr(measurement, "event_count", "N/A"),
+            "confidence_level": getattr(measurement, "confidence_level", "N/A"),
+            "technique": getattr(measurement, "technique", "N/A"),
+            "charge": getattr(measurement, "charge", "N/A"),
+            "changebar": getattr(measurement, "changebar", False),
+            "comment": getattr(measurement, "comment", "N/A"),
+            "data_flags": getattr(measurement, "data_flags", "N/A"),
+            "scale_factor": getattr(measurement, "scale_factor", "N/A"),
+        }
+        return formatted
+    except Exception as e:
+        return {"error": f"Failed to format measurement: {str(e)}"}
 
 
 def format_pdg_value(value):
