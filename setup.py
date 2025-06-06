@@ -17,7 +17,6 @@ setup(
     name="ParticlePhysics-mcp-server",
     version="1.0.0",
     author="uzerone, bee4come",
-    author_email="",
     description="Model Context Protocol server for Particle Data Group (PDG) physics data",
     long_description=long_description,
     long_description_content_type="text/markdown",
