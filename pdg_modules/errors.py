@@ -233,7 +233,9 @@ def get_error_tools() -> List[types.Tool]:
     ]
 
 
-def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+def safe_get_attribute(
+    obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None
+) -> Any:
     """Safely get attribute from object with optional transformation and enhanced logging."""
     try:
         value = getattr(obj, attr, default)
@@ -257,43 +259,45 @@ def analyze_pdg_identifier_format(pdgid: str) -> Dict[str, Any]:
             "validity_score": 0.0,
             "format_errors": [],
         }
-        
+
         # Common PDG identifier patterns
         patterns = {
             "summary_table": r"^S\d{3}$",  # e.g., S008
-            "mass_entry": r"^M\d{3}$",    # e.g., M100
-            "width_entry": r"^G\d{3}$",   # e.g., G100
-            "lifetime_entry": r"^T\d{3}$", # e.g., T100
+            "mass_entry": r"^M\d{3}$",  # e.g., M100
+            "width_entry": r"^G\d{3}$",  # e.g., G100
+            "lifetime_entry": r"^T\d{3}$",  # e.g., T100
             "particle_name": r"^[a-zA-Z][a-zA-Z0-9_\-\+]*$",  # e.g., pi+, e-
-            "mcid_numeric": r"^\d+$",      # Monte Carlo ID
+            "mcid_numeric": r"^\d+$",  # Monte Carlo ID
             "compound_id": r"^[SMGT]\d{3}/\d{4}$",  # With edition, e.g., S008/2024
         }
-        
+
         # Check against known patterns
         for pattern_name, pattern in patterns.items():
             if re.match(pattern, pdgid):
                 analysis["pattern_matches"].append(pattern_name)
-                analysis["validity_score"] += 0.8 if pattern_name != "particle_name" else 0.6
-        
+                analysis["validity_score"] += (
+                    0.8 if pattern_name != "particle_name" else 0.6
+                )
+
         # Detailed format analysis
-        if pdgid.startswith(('S', 'M', 'G', 'T')):
+        if pdgid.startswith(("S", "M", "G", "T")):
             analysis["format_type"] = "pdg_code"
             analysis["components"]["prefix"] = pdgid[0]
             analysis["components"]["number"] = pdgid[1:]
-            
+
             # Check number format
             try:
-                num_part = pdgid[1:].split('/')[0]  # Handle edition part
+                num_part = pdgid[1:].split("/")[0]  # Handle edition part
                 int(num_part)
                 analysis["components"]["number_valid"] = True
                 analysis["validity_score"] += 0.2
             except ValueError:
                 analysis["format_errors"].append("Invalid number format after prefix")
                 analysis["components"]["number_valid"] = False
-            
+
             # Check for edition
-            if '/' in pdgid:
-                parts = pdgid.split('/')
+            if "/" in pdgid:
+                parts = pdgid.split("/")
                 if len(parts) == 2:
                     analysis["components"]["edition"] = parts[1]
                     try:
@@ -302,45 +306,47 @@ def analyze_pdg_identifier_format(pdgid: str) -> Dict[str, Any]:
                     except ValueError:
                         analysis["format_errors"].append("Invalid edition format")
                         analysis["components"]["edition_valid"] = False
-                        
+
         elif pdgid.isdigit():
             analysis["format_type"] = "monte_carlo_id"
             analysis["components"]["mcid"] = int(pdgid)
             analysis["validity_score"] += 0.7
-            
+
         else:
             analysis["format_type"] = "particle_name"
             analysis["components"]["name"] = pdgid
-            
+
             # Check particle name format
             if re.match(r"^[a-zA-Z][a-zA-Z0-9_\-\+]*$", pdgid):
                 analysis["validity_score"] += 0.6
             else:
                 analysis["format_errors"].append("Invalid particle name format")
-        
+
         # Additional format checks
         if len(pdgid) == 0:
             analysis["format_errors"].append("Empty identifier")
         elif len(pdgid) > 50:
             analysis["format_errors"].append("Identifier too long")
-        
+
         return analysis
-        
+
     except Exception as e:
         logger.error(f"Error analyzing PDG identifier format: {e}")
         return {"error": f"Format analysis failed: {str(e)}"}
 
 
-def generate_pdg_identifier_suggestions(pdgid: str, max_suggestions: int = 5) -> List[Dict[str, Any]]:
+def generate_pdg_identifier_suggestions(
+    pdgid: str, max_suggestions: int = 5
+) -> List[Dict[str, Any]]:
     """Generate intelligent suggestions for PDG identifiers."""
     try:
         suggestions = []
-        
+
         # Common corrections based on patterns
         corrections = {
             # Common misspellings
             "electron": ["e-", "e+"],
-            "muon": ["mu-", "mu+"], 
+            "muon": ["mu-", "mu+"],
             "tau": ["tau-", "tau+"],
             "proton": ["p", "p+"],
             "neutron": ["n", "n0"],
@@ -351,51 +357,72 @@ def generate_pdg_identifier_suggestions(pdgid: str, max_suggestions: int = 5) ->
             "w": ["W+", "W-"],
             "z": ["Z0"],
             "higgs": ["H"],
-            
             # PDG code corrections
             "s008": ["S008"],
             "m100": ["M100"],
             "g100": ["G100"],
             "t100": ["T100"],
         }
-        
+
         # Check for direct corrections
         pdgid_lower = pdgid.lower()
         if pdgid_lower in corrections:
             for suggestion in corrections[pdgid_lower]:
-                suggestions.append({
-                    "suggestion": suggestion,
-                    "type": "direct_correction",
-                    "confidence": 0.9,
-                    "reason": f"Common name correction for '{pdgid}'",
-                })
-        
+                suggestions.append(
+                    {
+                        "suggestion": suggestion,
+                        "type": "direct_correction",
+                        "confidence": 0.9,
+                        "reason": f"Common name correction for '{pdgid}'",
+                    }
+                )
+
         # Format-based suggestions
-        if len(pdgid) == 4 and pdgid[0].lower() in 'smgt':
+        if len(pdgid) == 4 and pdgid[0].lower() in "smgt":
             # Suggest proper case
-            suggestions.append({
-                "suggestion": pdgid.upper(),
-                "type": "case_correction",
-                "confidence": 0.8,
-                "reason": "PDG codes should be uppercase",
-            })
-        
+            suggestions.append(
+                {
+                    "suggestion": pdgid.upper(),
+                    "type": "case_correction",
+                    "confidence": 0.8,
+                    "reason": "PDG codes should be uppercase",
+                }
+            )
+
         # Partial match suggestions
         common_particles = [
-            "e-", "e+", "mu-", "mu+", "tau-", "tau+",
-            "p", "n", "pi+", "pi-", "pi0", "K+", "K-", "K0",
-            "gamma", "W+", "W-", "Z0", "H"
+            "e-",
+            "e+",
+            "mu-",
+            "mu+",
+            "tau-",
+            "tau+",
+            "p",
+            "n",
+            "pi+",
+            "pi-",
+            "pi0",
+            "K+",
+            "K-",
+            "K0",
+            "gamma",
+            "W+",
+            "W-",
+            "Z0",
+            "H",
         ]
-        
+
         for particle in common_particles:
             if pdgid.lower() in particle.lower() or particle.lower() in pdgid.lower():
-                suggestions.append({
-                    "suggestion": particle,
-                    "type": "partial_match",
-                    "confidence": 0.6,
-                    "reason": f"Partial match with common particle '{particle}'",
-                })
-        
+                suggestions.append(
+                    {
+                        "suggestion": particle,
+                        "type": "partial_match",
+                        "confidence": 0.6,
+                        "reason": f"Partial match with common particle '{particle}'",
+                    }
+                )
+
         # Remove duplicates and sort by confidence
         seen = set()
         unique_suggestions = []
@@ -403,11 +430,11 @@ def generate_pdg_identifier_suggestions(pdgid: str, max_suggestions: int = 5) ->
             if s["suggestion"] not in seen:
                 seen.add(s["suggestion"])
                 unique_suggestions.append(s)
-        
+
         unique_suggestions.sort(key=lambda x: x["confidence"], reverse=True)
-        
+
         return unique_suggestions[:max_suggestions]
-        
+
     except Exception as e:
         logger.error(f"Error generating suggestions: {e}")
         return []

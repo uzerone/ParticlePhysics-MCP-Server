@@ -152,7 +152,9 @@ import mcp.types as types
 logger = logging.getLogger(__name__)
 
 
-def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+def safe_get_attribute(
+    obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None
+) -> Any:
     """Safely get attribute from object with optional transformation and enhanced logging."""
     try:
         value = getattr(obj, attr, default)
@@ -174,62 +176,74 @@ def validate_pdg_identifier_format(pdgid: str) -> Dict[str, Any]:
             "suggestions": [],
             "error_details": [],
         }
-        
+
         # Basic format checks
         if not pdgid or not isinstance(pdgid, str):
-            validation_result["error_details"].append("Identifier must be a non-empty string")
+            validation_result["error_details"].append(
+                "Identifier must be a non-empty string"
+            )
             return validation_result
-        
+
         # Remove whitespace and normalize
         clean_pdgid = pdgid.strip().upper()
         validation_result["normalized"] = clean_pdgid
-        
+
         # Check for edition separator
         has_edition = "/" in clean_pdgid
         if has_edition:
             parts = clean_pdgid.split("/")
             if len(parts) != 2:
-                validation_result["error_details"].append("Invalid edition format: too many '/' separators")
+                validation_result["error_details"].append(
+                    "Invalid edition format: too many '/' separators"
+                )
                 return validation_result
             base_id, edition = parts
         else:
             base_id = clean_pdgid
             edition = None
-        
+
         validation_result["format_analysis"] = {
             "base_identifier": base_id,
             "edition": edition,
             "has_edition": has_edition,
             "length": len(base_id),
         }
-        
+
         # Validate base identifier format
         if base_id:
             # Check for valid PDG identifier patterns
             valid_patterns = {
-                "Summary": base_id.startswith("S") and base_id[1:].isdigit() and len(base_id) >= 4,
+                "Summary": base_id.startswith("S")
+                and base_id[1:].isdigit()
+                and len(base_id) >= 4,
                 "Mass": base_id.startswith("M") and base_id[1:].isdigit(),
                 "Width": base_id.startswith("G") and base_id[1:].isdigit(),
                 "Lifetime": base_id.startswith("T") and base_id[1:].isdigit(),
                 "Branching": base_id.startswith("B") and base_id[1:].isdigit(),
                 "Decay": base_id.startswith("D") and base_id[1:].isdigit(),
             }
-            
+
             validation_result["format_analysis"]["pattern_matches"] = {
-                pattern: matches for pattern, matches in valid_patterns.items() if matches
+                pattern: matches
+                for pattern, matches in valid_patterns.items()
+                if matches
             }
-            
+
             if any(valid_patterns.values()):
                 validation_result["is_valid"] = True
             else:
-                validation_result["error_details"].append(f"Unrecognized PDG identifier pattern: {base_id}")
-                validation_result["suggestions"].extend([
-                    "PDG identifiers typically start with S, M, G, T, B, or D followed by numbers",
-                    "Summary identifiers: S008, S009, etc.",
-                    "Mass identifiers: M001, M002, etc.",
-                    "Examples: 'S008', 'M100', 'G023/2024'"
-                ])
-        
+                validation_result["error_details"].append(
+                    f"Unrecognized PDG identifier pattern: {base_id}"
+                )
+                validation_result["suggestions"].extend(
+                    [
+                        "PDG identifiers typically start with S, M, G, T, B, or D followed by numbers",
+                        "Summary identifiers: S008, S009, etc.",
+                        "Mass identifiers: M001, M002, etc.",
+                        "Examples: 'S008', 'M100', 'G023/2024'",
+                    ]
+                )
+
         # Validate edition if present
         if edition:
             try:
@@ -238,12 +252,16 @@ def validate_pdg_identifier_format(pdgid: str) -> Dict[str, Any]:
                     validation_result["format_analysis"]["edition_year"] = year
                     validation_result["format_analysis"]["edition_valid"] = True
                 else:
-                    validation_result["error_details"].append(f"Edition year {year} is outside expected range (1950-2050)")
+                    validation_result["error_details"].append(
+                        f"Edition year {year} is outside expected range (1950-2050)"
+                    )
             except ValueError:
-                validation_result["error_details"].append(f"Edition '{edition}' is not a valid year")
-        
+                validation_result["error_details"].append(
+                    f"Edition '{edition}' is not a valid year"
+                )
+
         return validation_result
-        
+
     except Exception as e:
         logger.error(f"Error validating PDG identifier: {e}")
         return {
@@ -258,30 +276,30 @@ def analyze_pdg_rounding_decision(error: float) -> Dict[str, Any]:
     try:
         if error <= 0:
             return {"error": "Error must be positive for PDG rounding analysis"}
-        
+
         analysis = {
             "original_error": error,
             "decision_process": {},
             "rounding_rules": {},
         }
-        
+
         # Calculate the three highest order digits
         log_error = math.log10(abs(error))
         if abs(error) < 1.0 and int(log_error) != log_error:
             power = int(log_error)
         else:
             power = int(log_error) + 1
-        
+
         reduced_error = error * 10 ** (-power)
         three_highest_digits = int(reduced_error * 100)
-        
+
         analysis["decision_process"] = {
             "log10_error": log_error,
             "power": power,
             "reduced_error": reduced_error,
             "three_highest_digits": three_highest_digits,
         }
-        
+
         # Apply PDG rounding rules with detailed explanation
         if three_highest_digits < 355:
             n_digits = 2
@@ -297,8 +315,10 @@ def analyze_pdg_rounding_decision(error: float) -> Dict[str, Any]:
             power += 1
             n_digits = 2
             rule_applied = "Rule 3: digits 950-999 → round up, 2 significant figures"
-            rule_rationale = "Error digits in upper range, round up to next order of magnitude"
-        
+            rule_rationale = (
+                "Error digits in upper range, round up to next order of magnitude"
+            )
+
         analysis["rounding_rules"] = {
             "rule_applied": rule_applied,
             "rule_rationale": rule_rationale,
@@ -306,19 +326,21 @@ def analyze_pdg_rounding_decision(error: float) -> Dict[str, Any]:
             "final_power": power,
             "final_reduced_error": reduced_error,
         }
-        
+
         # Calculate final rounded values
         new_error = round(reduced_error, n_digits) * 10**power
         analysis["final_error"] = new_error
-        
+
         return analysis
-        
+
     except Exception as e:
         logger.error(f"Error analyzing PDG rounding decision: {e}")
         return {"error": f"Analysis failed: {str(e)}"}
 
 
-def format_pdg_value_with_uncertainty(value: float, error: float, units: str = "", use_pdg_rounding: bool = True) -> Dict[str, Any]:
+def format_pdg_value_with_uncertainty(
+    value: float, error: float, units: str = "", use_pdg_rounding: bool = True
+) -> Dict[str, Any]:
     """Format value with uncertainty following PDG conventions."""
     try:
         result = {
@@ -326,30 +348,34 @@ def format_pdg_value_with_uncertainty(value: float, error: float, units: str = "
             "formatted": {},
             "pdg_compliant": use_pdg_rounding,
         }
-        
+
         if use_pdg_rounding:
             # Apply PDG rounding
             rounded_value, rounded_error = pdg_round_utils(value, error)
             result["rounded"] = {"value": rounded_value, "error": rounded_error}
-            
+
             # Format according to PDG conventions
             rounding_analysis = analyze_pdg_rounding_decision(error)
-            n_digits = rounding_analysis.get("rounding_rules", {}).get("significant_digits", 1)
-            
+            n_digits = rounding_analysis.get("rounding_rules", {}).get(
+                "significant_digits", 1
+            )
+
             if n_digits == 1:
                 error_str = f"{rounded_error:.0g}"
                 # Match value precision to error precision
-                value_precision = len(error_str) - (1 if '.' in error_str else 0)
-                value_str = f"{rounded_value:.{max(0, value_precision)}f}".rstrip('0').rstrip('.')
+                value_precision = len(error_str) - (1 if "." in error_str else 0)
+                value_str = f"{rounded_value:.{max(0, value_precision)}f}".rstrip(
+                    "0"
+                ).rstrip(".")
             else:
                 error_str = f"{rounded_error:.1g}"
-                value_str = f"{rounded_value:.{n_digits-1}f}".rstrip('0').rstrip('.')
-            
+                value_str = f"{rounded_value:.{n_digits-1}f}".rstrip("0").rstrip(".")
+
             # Construct formatted string
             formatted_str = f"{value_str} ± {error_str}"
             if units:
                 formatted_str += f" {units}"
-            
+
             result["formatted"] = {
                 "value_string": value_str,
                 "error_string": error_str,
@@ -362,9 +388,9 @@ def format_pdg_value_with_uncertainty(value: float, error: float, units: str = "
             if units:
                 formatted_str += f" {units}"
             result["formatted"]["combined_string"] = formatted_str
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(f"Error formatting PDG value: {e}")
         return {"error": f"Formatting failed: {str(e)}"}
@@ -441,7 +467,13 @@ def get_utils_tools() -> List[types.Tool]:
                     },
                     "property_type": {
                         "type": "string",
-                        "enum": ["mass", "lifetime", "width", "branching_fraction", "all"],
+                        "enum": [
+                            "mass",
+                            "lifetime",
+                            "width",
+                            "branching_fraction",
+                            "all",
+                        ],
                         "description": "Type of property to find best value for",
                     },
                     "pedantic": {
@@ -724,7 +756,7 @@ async def handle_utils_tools(
             if validate_format:
                 validation = validate_pdg_identifier_format(pdgid)
                 result["validation"] = validation
-                
+
                 if not validation.get("is_valid", False):
                     result["warnings"] = validation.get("error_details", [])
                     result["suggestions"] = validation.get("suggestions", [])
@@ -741,10 +773,10 @@ async def handle_utils_tools(
                             "G": "Width measurements",
                             "T": "Lifetime measurements",
                             "B": "Branching fraction measurements",
-                            "D": "Decay mode data"
-                        }
+                            "D": "Decay mode data",
+                        },
                     },
-                    "edition_info": "Edition typically represents PDG Review year (e.g., 2024, 2022)"
+                    "edition_info": "Edition typically represents PDG Review year (e.g., 2024, 2022)",
                 }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
@@ -754,7 +786,11 @@ async def handle_utils_tools(
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to parse PDG identifier: {str(e)}", "input": pdgid}, indent=2
+                        {
+                            "error": f"Failed to parse PDG identifier: {str(e)}",
+                            "input": pdgid,
+                        },
+                        indent=2,
                     ),
                 )
             ]
@@ -824,7 +860,7 @@ async def handle_utils_tools(
                             {
                                 "error": f"No {property_type} properties found for {particle_name}",
                                 "particle_name": particle_name,
-                                "property_type": property_type
+                                "property_type": property_type,
                             },
                             indent=2,
                         ),
@@ -840,12 +876,12 @@ async def handle_utils_tools(
                     "particle_name": particle_name,
                     "property_type": property_type,
                     "pedantic_mode": pedantic,
-                    "data_quality_threshold": data_quality_threshold
+                    "data_quality_threshold": data_quality_threshold,
                 },
                 "summary": {
                     "total_properties_found": len(properties),
-                    "selection_status": "success" if best_prop else "failed"
-                }
+                    "selection_status": "success" if best_prop else "failed",
+                },
             }
 
             if best_prop is None:
@@ -854,19 +890,23 @@ async def handle_utils_tools(
                 result["suggestions"] = [
                     "Try with pedantic=False for more lenient selection criteria",
                     "Check if the particle name is correct",
-                    f"Verify that {property_type} measurements exist for this particle"
+                    f"Verify that {property_type} measurements exist for this particle",
                 ]
             else:
                 result["status"] = "success"
                 result["selected_property"] = {
                     "pdgid": safe_get_attribute(best_prop, "pdgid", "N/A"),
                     "description": safe_get_attribute(best_prop, "description", "N/A"),
-                    "display_value": safe_get_attribute(best_prop, "display_value_text", "N/A"),
+                    "display_value": safe_get_attribute(
+                        best_prop, "display_value_text", "N/A"
+                    ),
                     "value": safe_get_attribute(best_prop, "value", "N/A"),
                     "units": safe_get_attribute(best_prop, "units", "N/A"),
                     "data_flags": safe_get_attribute(best_prop, "data_flags", "N/A"),
-                    "in_summary_table": safe_get_attribute(best_prop, "in_summary_table", False),
-                    "is_limit": safe_get_attribute(best_prop, "is_limit", False)
+                    "in_summary_table": safe_get_attribute(
+                        best_prop, "in_summary_table", False
+                    ),
+                    "is_limit": safe_get_attribute(best_prop, "is_limit", False),
                 }
 
                 # Add detailed analysis if requested
@@ -875,43 +915,63 @@ async def handle_utils_tools(
                         "selection_criteria": {
                             "primary": "PDG recommended values (in_summary_table=True)",
                             "secondary": "Data quality flags and measurement precision",
-                            "pedantic_mode": f"{'Enabled' if pedantic else 'Disabled'} - {'strict' if pedantic else 'lenient'} criteria"
+                            "pedantic_mode": f"{'Enabled' if pedantic else 'Disabled'} - {'strict' if pedantic else 'lenient'} criteria",
                         },
                         "alternatives_considered": len(properties) - 1,
                         "quality_assessment": {
-                            "recommended_value": safe_get_attribute(best_prop, "in_summary_table", False),
-                            "has_uncertainty": safe_get_attribute(best_prop, "value", "N/A") != "N/A",
-                            "data_flags_status": safe_get_attribute(best_prop, "data_flags", "N/A")
-                        }
+                            "recommended_value": safe_get_attribute(
+                                best_prop, "in_summary_table", False
+                            ),
+                            "has_uncertainty": safe_get_attribute(
+                                best_prop, "value", "N/A"
+                            )
+                            != "N/A",
+                            "data_flags_status": safe_get_attribute(
+                                best_prop, "data_flags", "N/A"
+                            ),
+                        },
                     }
 
                     # Add information about other properties for comparison
                     if len(properties) > 1:
                         alternatives = []
-                        for i, prop in enumerate(properties[:3]):  # Show top 3 alternatives
+                        for i, prop in enumerate(
+                            properties[:3]
+                        ):  # Show top 3 alternatives
                             if prop != best_prop:
-                                alternatives.append({
-                                    "rank": i + 2,
-                                    "pdgid": safe_get_attribute(prop, "pdgid", "N/A"),
-                                    "value": safe_get_attribute(prop, "display_value_text", "N/A"),
-                                    "in_summary_table": safe_get_attribute(prop, "in_summary_table", False)
-                                })
+                                alternatives.append(
+                                    {
+                                        "rank": i + 2,
+                                        "pdgid": safe_get_attribute(
+                                            prop, "pdgid", "N/A"
+                                        ),
+                                        "value": safe_get_attribute(
+                                            prop, "display_value_text", "N/A"
+                                        ),
+                                        "in_summary_table": safe_get_attribute(
+                                            prop, "in_summary_table", False
+                                        ),
+                                    }
+                                )
                         result["analysis"]["top_alternatives"] = alternatives
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
-            logger.error(f"Error finding best property for {particle_name} ({property_type}): {e}")
+            logger.error(
+                f"Error finding best property for {particle_name} ({property_type}): {e}"
+            )
             return [
                 types.TextContent(
                     type="text",
                     text=json.dumps(
                         {
-                            "error": f"Failed to find best property: {str(e)}", 
+                            "error": f"Failed to find best property: {str(e)}",
                             "query": {
                                 "particle_name": particle_name,
-                                "property_type": property_type
-                            }
-                        }, indent=2
+                                "property_type": property_type,
+                            },
+                        },
+                        indent=2,
                     ),
                 )
             ]
@@ -929,7 +989,10 @@ async def handle_utils_tools(
                     types.TextContent(
                         type="text",
                         text=json.dumps(
-                            {"error": "Error/uncertainty must be positive for PDG rounding"}, indent=2
+                            {
+                                "error": "Error/uncertainty must be positive for PDG rounding"
+                            },
+                            indent=2,
                         ),
                     )
                 ]
@@ -940,15 +1003,15 @@ async def handle_utils_tools(
                 "input": {
                     "value": value,
                     "error": error,
-                    "precision_context": precision_context
+                    "precision_context": precision_context,
                 },
                 "output": {
                     "rounded_value": rounded_value,
                     "rounded_error": rounded_error,
                     "change_in_value": abs(rounded_value - value),
                     "change_in_error": abs(rounded_error - error),
-                    "rounding_applied": True
-                }
+                    "rounding_applied": True,
+                },
             }
 
             # Add detailed analysis if requested
@@ -958,7 +1021,9 @@ async def handle_utils_tools(
 
             # Add formatted output if requested
             if format_output:
-                formatting_result = format_pdg_value_with_uncertainty(value, error, "", True)
+                formatting_result = format_pdg_value_with_uncertainty(
+                    value, error, "", True
+                )
                 result["formatted_output"] = formatting_result.get("formatted", {})
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
@@ -968,7 +1033,11 @@ async def handle_utils_tools(
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to apply PDG rounding: {str(e)}", "input": {"value": value, "error": error}}, indent=2
+                        {
+                            "error": f"Failed to apply PDG rounding: {str(e)}",
+                            "input": {"value": value, "error": error},
+                        },
+                        indent=2,
                     ),
                 )
             ]

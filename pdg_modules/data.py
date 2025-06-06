@@ -280,8 +280,14 @@ def get_data_tools() -> List[types.Tool]:
                     "year_filter": {
                         "type": "object",
                         "properties": {
-                            "min_year": {"type": "integer", "description": "Minimum publication year"},
-                            "max_year": {"type": "integer", "description": "Maximum publication year"},
+                            "min_year": {
+                                "type": "integer",
+                                "description": "Minimum publication year",
+                            },
+                            "max_year": {
+                                "type": "integer",
+                                "description": "Maximum publication year",
+                            },
                         },
                         "description": "Filter measurements by publication year range",
                     },
@@ -472,7 +478,9 @@ def get_data_tools() -> List[types.Tool]:
     ]
 
 
-def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+def safe_get_attribute(
+    obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None
+) -> Any:
     """Safely get attribute from object with optional transformation and logging."""
     try:
         value = getattr(obj, attr, default)
@@ -484,22 +492,24 @@ def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func:
         return default
 
 
-def format_value_with_precision(value: Any, precision: int = 6, scientific_threshold: float = 1e-4) -> str:
+def format_value_with_precision(
+    value: Any, precision: int = 6, scientific_threshold: float = 1e-4
+) -> str:
     """Format numerical values with appropriate precision and notation."""
     try:
         if value is None:
             return "N/A"
-        
+
         num_val = float(value)
-        
+
         # Use scientific notation for very small or very large numbers
-        if abs(num_val) < scientific_threshold or abs(num_val) >= 10**(precision):
+        if abs(num_val) < scientific_threshold or abs(num_val) >= 10 ** (precision):
             return f"{num_val:.{precision-1}e}"
         else:
             # Use fixed precision, removing trailing zeros
             formatted = f"{num_val:.{precision}g}"
             return formatted
-            
+
     except (ValueError, TypeError):
         return str(value) if value is not None else "N/A"
 
@@ -514,7 +524,7 @@ def analyze_measurement_uncertainty(measurement: Any) -> Dict[str, Any]:
             "total_uncertainty": None,
             "relative_uncertainty": None,
         }
-        
+
         # Get measurement value
         value = safe_get_attribute(measurement, "value", 0)
         if value == 0:
@@ -527,15 +537,15 @@ def analyze_measurement_uncertainty(measurement: Any) -> Dict[str, Any]:
                         value = safe_get_attribute(value_obj, "value", 0)
             except:
                 pass
-        
+
         # Analyze error components
         error_pos = safe_get_attribute(measurement, "error_positive")
-        error_neg = safe_get_attribute(measurement, "error_negative") 
+        error_neg = safe_get_attribute(measurement, "error_negative")
         error_sym = safe_get_attribute(measurement, "error")
-        
+
         if error_pos is not None or error_neg is not None or error_sym is not None:
             uncertainty_analysis["has_uncertainty"] = True
-            
+
             if error_pos == error_neg or (error_pos is not None and error_neg is None):
                 uncertainty_analysis["uncertainty_type"] = "symmetric"
                 total_error = error_pos if error_pos is not None else error_sym
@@ -547,32 +557,36 @@ def analyze_measurement_uncertainty(measurement: Any) -> Dict[str, Any]:
                 uncertainty_analysis["components"]["negative"] = error_neg
                 # Use average as total uncertainty estimate
                 if error_pos is not None and error_neg is not None:
-                    uncertainty_analysis["total_uncertainty"] = (abs(error_pos) + abs(error_neg)) / 2
-        
+                    uncertainty_analysis["total_uncertainty"] = (
+                        abs(error_pos) + abs(error_neg)
+                    ) / 2
+
         # Calculate relative uncertainty
         if uncertainty_analysis["total_uncertainty"] is not None and value != 0:
             rel_uncertainty = uncertainty_analysis["total_uncertainty"] / abs(value)
             uncertainty_analysis["relative_uncertainty"] = rel_uncertainty
             uncertainty_analysis["relative_uncertainty_percent"] = rel_uncertainty * 100
-            
+
             # Classify uncertainty magnitude
             if rel_uncertainty < 0.001:
                 uncertainty_analysis["precision_class"] = "very_high"
             elif rel_uncertainty < 0.01:
-                uncertainty_analysis["precision_class"] = "high" 
+                uncertainty_analysis["precision_class"] = "high"
             elif rel_uncertainty < 0.1:
                 uncertainty_analysis["precision_class"] = "moderate"
             else:
                 uncertainty_analysis["precision_class"] = "low"
-        
+
         return uncertainty_analysis
-        
+
     except Exception as e:
         logger.debug(f"Error analyzing measurement uncertainty: {e}")
         return {"error": f"Failed to analyze uncertainty: {str(e)}"}
 
 
-def format_enhanced_summary_value(summary_value: Any, precision: int = 6, target_units: Optional[str] = None) -> Dict[str, Any]:
+def format_enhanced_summary_value(
+    summary_value: Any, precision: int = 6, target_units: Optional[str] = None
+) -> Dict[str, Any]:
     """Enhanced formatting for PdgSummaryValue objects with comprehensive metadata."""
     try:
         result = {
@@ -580,13 +594,15 @@ def format_enhanced_summary_value(summary_value: Any, precision: int = 6, target
             "value": safe_get_attribute(summary_value, "value"),
             "units": safe_get_attribute(summary_value, "units", "dimensionless"),
         }
-        
+
         # Enhanced value formatting
         if result["value"] is not None:
-            result["formatted_value"] = format_value_with_precision(result["value"], precision)
+            result["formatted_value"] = format_value_with_precision(
+                result["value"], precision
+            )
         else:
             result["formatted_value"] = "N/A"
-        
+
         # Comprehensive text representations
         for attr in ["value_text", "display_value_text", "text", "display_text"]:
             value_text = safe_get_attribute(summary_value, attr)
@@ -595,29 +611,39 @@ def format_enhanced_summary_value(summary_value: Any, precision: int = 6, target
                 break
         else:
             result["display_text"] = result["formatted_value"]
-        
+
         # Error analysis
         uncertainty = analyze_measurement_uncertainty(summary_value)
         result["uncertainty_analysis"] = uncertainty
-        
+
         # Enhanced error information
         result["error_positive"] = safe_get_attribute(summary_value, "error_positive")
         result["error_negative"] = safe_get_attribute(summary_value, "error_negative")
         result["error"] = safe_get_attribute(summary_value, "error")
-        
+
         # Quality and type indicators
         result["is_limit"] = safe_get_attribute(summary_value, "is_limit", False)
-        result["is_lower_limit"] = safe_get_attribute(summary_value, "is_lower_limit", False)
-        result["is_upper_limit"] = safe_get_attribute(summary_value, "is_upper_limit", False)
-        result["confidence_level"] = safe_get_attribute(summary_value, "confidence_level")
+        result["is_lower_limit"] = safe_get_attribute(
+            summary_value, "is_lower_limit", False
+        )
+        result["is_upper_limit"] = safe_get_attribute(
+            summary_value, "is_upper_limit", False
+        )
+        result["confidence_level"] = safe_get_attribute(
+            summary_value, "confidence_level"
+        )
         result["scale_factor"] = safe_get_attribute(summary_value, "scale_factor")
-        
+
         # Metadata
-        result["in_summary_table"] = safe_get_attribute(summary_value, "in_summary_table", False)
+        result["in_summary_table"] = safe_get_attribute(
+            summary_value, "in_summary_table", False
+        )
         result["value_type"] = safe_get_attribute(summary_value, "value_type", "N/A")
-        result["value_type_key"] = safe_get_attribute(summary_value, "value_type_key", "N/A")
+        result["value_type_key"] = safe_get_attribute(
+            summary_value, "value_type_key", "N/A"
+        )
         result["comment"] = safe_get_attribute(summary_value, "comment")
-        
+
         # Data quality indicators
         result["data_quality"] = {
             "has_error": uncertainty["has_uncertainty"],
@@ -625,30 +651,39 @@ def format_enhanced_summary_value(summary_value: Any, precision: int = 6, target
             "is_measurement": not result["is_limit"],
             "confidence_level": result["confidence_level"],
         }
-        
+
         # Unit conversion if requested
         if target_units and target_units != result["units"]:
             try:
                 from pdg.units import convert
+
                 if result["value"] is not None:
-                    converted_value = convert(result["value"], result["units"], target_units)
+                    converted_value = convert(
+                        result["value"], result["units"], target_units
+                    )
                     result["converted_value"] = {
                         "value": converted_value,
-                        "formatted": format_value_with_precision(converted_value, precision),
+                        "formatted": format_value_with_precision(
+                            converted_value, precision
+                        ),
                         "units": target_units,
                     }
-                    
+
                     # Convert errors if present
                     if result["error"]:
-                        converted_error = convert(result["error"], result["units"], target_units)
+                        converted_error = convert(
+                            result["error"], result["units"], target_units
+                        )
                         result["converted_value"]["error"] = converted_error
-                        
+
             except Exception as e:
                 logger.debug(f"Unit conversion failed: {e}")
-                result["conversion_error"] = f"Failed to convert to {target_units}: {str(e)}"
+                result["conversion_error"] = (
+                    f"Failed to convert to {target_units}: {str(e)}"
+                )
 
         return result
-        
+
     except Exception as e:
         logger.error(f"Failed to format summary value: {e}")
         return {
@@ -657,7 +692,11 @@ def format_enhanced_summary_value(summary_value: Any, precision: int = 6, target
         }
 
 
-def format_enhanced_measurement(measurement: Any, include_references: bool = True, include_error_breakdown: bool = True) -> Dict[str, Any]:
+def format_enhanced_measurement(
+    measurement: Any,
+    include_references: bool = True,
+    include_error_breakdown: bool = True,
+) -> Dict[str, Any]:
     """Enhanced formatting for PdgMeasurement objects with comprehensive analysis."""
     try:
         formatted = {
@@ -671,28 +710,40 @@ def format_enhanced_measurement(measurement: Any, include_references: bool = Tru
             if hasattr(measurement, "get_value") and callable(measurement.get_value):
                 value_obj = measurement.get_value()
                 if value_obj:
-                formatted["value"] = {
+                    formatted["value"] = {
                         "value": safe_get_attribute(value_obj, "value"),
-                        "formatted": format_value_with_precision(safe_get_attribute(value_obj, "value", 0)),
-                        "units": safe_get_attribute(value_obj, "units", "dimensionless"),
-                        "value_text": safe_get_attribute(value_obj, "value_text", "N/A"),
-                        "error_positive": safe_get_attribute(value_obj, "error_positive"),
-                        "error_negative": safe_get_attribute(value_obj, "error_negative"),
+                        "formatted": format_value_with_precision(
+                            safe_get_attribute(value_obj, "value", 0)
+                        ),
+                        "units": safe_get_attribute(
+                            value_obj, "units", "dimensionless"
+                        ),
+                        "value_text": safe_get_attribute(
+                            value_obj, "value_text", "N/A"
+                        ),
+                        "error_positive": safe_get_attribute(
+                            value_obj, "error_positive"
+                        ),
+                        "error_negative": safe_get_attribute(
+                            value_obj, "error_negative"
+                        ),
                     }
-                    
+
                     # Enhanced uncertainty analysis
                     if include_error_breakdown:
-                        formatted["uncertainty_analysis"] = analyze_measurement_uncertainty(value_obj)
+                        formatted["uncertainty_analysis"] = (
+                            analyze_measurement_uncertainty(value_obj)
+                        )
         except Exception as e:
             logger.debug(f"Error getting measurement value: {e}")
             formatted["value"] = {"error": f"Failed to get value: {str(e)}"}
-        
+
         # Enhanced reference information
         if include_references:
-        try:
-            if hasattr(measurement, "reference") and measurement.reference:
-                ref = measurement.reference
-                formatted["reference"] = {
+            try:
+                if hasattr(measurement, "reference") and measurement.reference:
+                    ref = measurement.reference
+                    formatted["reference"] = {
                         "id": safe_get_attribute(ref, "id"),
                         "title": safe_get_attribute(ref, "title", "N/A"),
                         "authors": safe_get_attribute(ref, "authors", "N/A"),
@@ -703,7 +754,7 @@ def format_enhanced_measurement(measurement: Any, include_references: bool = Tru
                         "page": safe_get_attribute(ref, "page"),
                         "arxiv": safe_get_attribute(ref, "arxiv"),
                     }
-                    
+
                     # Create citation string
                     authors = formatted["reference"]["authors"]
                     year = formatted["reference"]["publication_year"]
@@ -712,19 +763,19 @@ def format_enhanced_measurement(measurement: Any, include_references: bool = Tru
                         formatted["reference"]["citation"] = f"{authors} ({year})"
                         if title and title != "N/A":
                             formatted["reference"]["citation"] += f", {title[:50]}..."
-    except Exception as e:
+            except Exception as e:
                 logger.debug(f"Error getting reference: {e}")
                 formatted["reference"] = {"error": f"Failed to get reference: {str(e)}"}
-        
+
         # Additional measurement metadata
         formatted["metadata"] = {
             "technique": safe_get_attribute(measurement, "technique"),
             "comment": safe_get_attribute(measurement, "comment"),
             "data_flags": safe_get_attribute(measurement, "data_flags"),
         }
-        
+
         return formatted
-        
+
     except Exception as e:
         logger.error(f"Failed to format measurement: {e}")
         return {
@@ -750,11 +801,13 @@ def get_property_by_type(particle: Any, property_type: str) -> List[Any]:
         return []
 
 
-def calculate_derived_quantities(value: float, error: float, property_type: str, units: str) -> Dict[str, Any]:
+def calculate_derived_quantities(
+    value: float, error: float, property_type: str, units: str
+) -> Dict[str, Any]:
     """Calculate physics-related derived quantities and conversions."""
     try:
         derived = {}
-        
+
         if property_type == "lifetime" and value > 0:
             # Calculate decay width from lifetime: Γ = ħ/τ
             try:
@@ -767,14 +820,14 @@ def calculate_derived_quantities(value: float, error: float, property_type: str,
                         "formatted": format_value_with_precision(width_gev),
                         "relation": "Γ = ħ/τ",
                     }
-                    
+
                     if error:
                         width_error = hbar_gev_s * error / (value**2)
                         derived["decay_width"]["error"] = width_error
-                        
+
             except Exception as e:
                 logger.debug(f"Error calculating decay width: {e}")
-        
+
         elif property_type == "width" and value > 0:
             # Calculate lifetime from width: τ = ħ/Γ
             try:
@@ -788,15 +841,15 @@ def calculate_derived_quantities(value: float, error: float, property_type: str,
                         "formatted": format_value_with_precision(lifetime_s),
                         "relation": "τ = ħ/Γ",
                     }
-                    
+
                     if error:
                         error_gev = error if units == "GeV" else error / 1000
                         lifetime_error = hbar_gev_s * error_gev / (value_gev**2)
                         derived["lifetime"]["error"] = lifetime_error
-                        
+
             except Exception as e:
                 logger.debug(f"Error calculating lifetime: {e}")
-        
+
         elif property_type == "mass":
             # Calculate energy equivalence and other mass-related quantities
             try:
@@ -808,24 +861,24 @@ def calculate_derived_quantities(value: float, error: float, property_type: str,
                         "formatted": format_value_with_precision(value),
                         "relation": "E₀ = mc²",
                     }
-                    
+
                     # Calculate mass in atomic mass units
                     if units == "GeV":
                         mass_u = value / 0.9314941  # GeV to u conversion
                     else:  # MeV
                         mass_u = value / 931.4941  # MeV to u conversion
-                        
+
                     derived["atomic_mass_units"] = {
                         "value": mass_u,
                         "units": "u",
                         "formatted": format_value_with_precision(mass_u),
                     }
-                    
+
             except Exception as e:
                 logger.debug(f"Error calculating mass equivalences: {e}")
-        
+
         return derived
-        
+
     except Exception as e:
         logger.error(f"Error calculating derived quantities: {e}")
         return {}
@@ -835,16 +888,16 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
     """Enhanced data tool handler with comprehensive functionality."""
 
     try:
-    if name == "get_mass_measurements":
-        particle_name = arguments["particle_name"]
-        include_summary_values = arguments.get("include_summary_values", True)
-        include_measurements = arguments.get("include_measurements", False)
+        if name == "get_mass_measurements":
+            particle_name = arguments["particle_name"]
+            include_summary_values = arguments.get("include_summary_values", True)
+            include_measurements = arguments.get("include_measurements", False)
             include_error_analysis = arguments.get("include_error_analysis", True)
-        units = arguments.get("units", "GeV")
+            units = arguments.get("units", "GeV")
             precision = arguments.get("precision", 6)
 
-        try:
-            particle = api.get_particle_by_name(particle_name)
+            try:
+                particle = api.get_particle_by_name(particle_name)
                 mass_data = {
                     "particle": particle_name,
                     "property": "mass",
@@ -853,48 +906,59 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                     "analysis_timestamp": "generated",
                 }
 
-            if include_summary_values:
-                summary_values = []
-                for mass_prop in particle.masses():
-                    for summary in mass_prop.summary_values():
-                            sv_data = format_enhanced_summary_value(summary, precision, units)
-                            
+                if include_summary_values:
+                    summary_values = []
+                    for mass_prop in particle.masses():
+                        for summary in mass_prop.summary_values():
+                            sv_data = format_enhanced_summary_value(
+                                summary, precision, units
+                            )
+
                             # Add derived quantities
                             if sv_data.get("value") is not None:
                                 derived = calculate_derived_quantities(
-                                    sv_data["value"], 
+                                    sv_data["value"],
                                     sv_data.get("error"),
                                     "mass",
-                                    sv_data["units"]
+                                    sv_data["units"],
                                 )
                                 if derived:
                                     sv_data["derived_quantities"] = derived
-                            
-                        summary_values.append(sv_data)
-                    
-                mass_data["summary_values"] = summary_values
+
+                            summary_values.append(sv_data)
+
+                    mass_data["summary_values"] = summary_values
                     mass_data["summary_count"] = len(summary_values)
 
-            if include_measurements:
-                measurements = []
-                for mass_prop in particle.masses():
+                if include_measurements:
+                    measurements = []
+                    for mass_prop in particle.masses():
                         try:
-                    for measurement in mass_prop.get_measurements():
+                            for measurement in mass_prop.get_measurements():
                                 meas_data = format_enhanced_measurement(
-                                    measurement, 
+                                    measurement,
                                     include_references=True,
-                                    include_error_breakdown=include_error_analysis
+                                    include_error_breakdown=include_error_analysis,
                                 )
                                 measurements.append(meas_data)
                         except Exception as e:
-                            logger.debug(f"Error getting measurements for mass property: {e}")
-                    
-                mass_data["measurements"] = measurements
+                            logger.debug(
+                                f"Error getting measurements for mass property: {e}"
+                            )
+
+                    mass_data["measurements"] = measurements
                     mass_data["measurement_count"] = len(measurements)
-                
+
                 # Add statistical summary if multiple values exist
-                if include_summary_values and len(mass_data.get("summary_values", [])) > 1:
-                    values = [sv["value"] for sv in mass_data["summary_values"] if sv.get("value") is not None]
+                if (
+                    include_summary_values
+                    and len(mass_data.get("summary_values", [])) > 1
+                ):
+                    values = [
+                        sv["value"]
+                        for sv in mass_data["summary_values"]
+                        if sv.get("value") is not None
+                    ]
                     if values:
                         mass_data["statistical_summary"] = {
                             "count": len(values),
@@ -902,12 +966,19 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                             "min": min(values),
                             "max": max(values),
                             "range": max(values) - min(values),
-                            "relative_spread": (max(values) - min(values)) / (sum(values) / len(values)) if sum(values) != 0 else 0,
+                            "relative_spread": (
+                                (max(values) - min(values))
+                                / (sum(values) / len(values))
+                                if sum(values) != 0
+                                else 0
+                            ),
                         }
-                
-                return [types.TextContent(type="text", text=json.dumps(mass_data, indent=2))]
-                
-        except Exception as e:
+
+                return [
+                    types.TextContent(type="text", text=json.dumps(mass_data, indent=2))
+                ]
+
+            except Exception as e:
                 error_response = {
                     "error": f"Failed to get mass measurements: {str(e)}",
                     "particle_name": particle_name,
@@ -915,103 +986,140 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                         "Verify particle name spelling",
                         "Check if particle has mass measurements",
                         "Try with different units",
-                    ]
+                    ],
                 }
-                return [types.TextContent(type="text", text=json.dumps(error_response, indent=2))]
+                return [
+                    types.TextContent(
+                        type="text", text=json.dumps(error_response, indent=2)
+                    )
+                ]
 
-    elif name == "get_lifetime_measurements":
-        particle_name = arguments["particle_name"]
-        include_summary_values = arguments.get("include_summary_values", True)
-        include_measurements = arguments.get("include_measurements", False)
+        elif name == "get_lifetime_measurements":
+            particle_name = arguments["particle_name"]
+            include_summary_values = arguments.get("include_summary_values", True)
+            include_measurements = arguments.get("include_measurements", False)
             include_decay_analysis = arguments.get("include_decay_analysis", True)
-        units = arguments.get("units", "s")
-            include_conversion_factors = arguments.get("include_conversion_factors", False)
+            units = arguments.get("units", "s")
+            include_conversion_factors = arguments.get(
+                "include_conversion_factors", False
+            )
 
-        try:
-            particle = api.get_particle_by_name(particle_name)
-            lifetime_data = {
-                "particle": particle_name,
-                "property": "lifetime",
-                "units": units,
+            try:
+                particle = api.get_particle_by_name(particle_name)
+                lifetime_data = {
+                    "particle": particle_name,
+                    "property": "lifetime",
+                    "units": units,
                     "analysis_features": {
                         "include_decay_analysis": include_decay_analysis,
                         "include_conversion_factors": include_conversion_factors,
-                    }
-            }
+                    },
+                }
 
-            if include_summary_values:
-                summary_values = []
-                for lifetime_prop in particle.lifetimes():
-                    for summary in lifetime_prop.summary_values():
-                            sv_data = format_enhanced_summary_value(summary, target_units=units)
-                            
+                if include_summary_values:
+                    summary_values = []
+                    for lifetime_prop in particle.lifetimes():
+                        for summary in lifetime_prop.summary_values():
+                            sv_data = format_enhanced_summary_value(
+                                summary, target_units=units
+                            )
+
                             # Add decay analysis
-                            if include_decay_analysis and sv_data.get("value") is not None:
+                            if (
+                                include_decay_analysis
+                                and sv_data.get("value") is not None
+                            ):
                                 derived = calculate_derived_quantities(
                                     sv_data["value"],
                                     sv_data.get("error"),
                                     "lifetime",
-                                    sv_data["units"]
+                                    sv_data["units"],
                                 )
                                 if derived:
                                     sv_data["derived_quantities"] = derived
-                            
+
                             # Add unit conversions
-                            if include_conversion_factors and sv_data.get("value") is not None:
+                            if (
+                                include_conversion_factors
+                                and sv_data.get("value") is not None
+                            ):
                                 common_units = ["s", "ns", "ps", "fs"]
                                 conversions = {}
                                 for unit in common_units:
                                     if unit != sv_data["units"]:
                                         try:
                                             from pdg.units import convert
-                                            converted = convert(sv_data["value"], sv_data["units"], unit)
+
+                                            converted = convert(
+                                                sv_data["value"], sv_data["units"], unit
+                                            )
                                             conversions[unit] = {
                                                 "value": converted,
-                                                "formatted": format_value_with_precision(converted),
+                                                "formatted": format_value_with_precision(
+                                                    converted
+                                                ),
                                             }
-                            except:
-                                pass
+                                        except:
+                                            pass
                                 sv_data["unit_conversions"] = conversions
-                            
-                        summary_values.append(sv_data)
-                    
+
+                            summary_values.append(sv_data)
+
                     lifetime_data["summary_values"] = summary_values
 
-            if include_measurements:
-                measurements = []
+                if include_measurements:
+                    measurements = []
                     for lifetime_prop in particle.lifetimes():
                         try:
                             for measurement in lifetime_prop.get_measurements():
-                                measurements.append(format_enhanced_measurement(measurement))
-        except Exception as e:
+                                measurements.append(
+                                    format_enhanced_measurement(measurement)
+                                )
+                        except Exception as e:
                             logger.debug(f"Error getting lifetime measurements: {e}")
-                    
+
                     lifetime_data["measurements"] = measurements
-                
-                return [types.TextContent(type="text", text=json.dumps(lifetime_data, indent=2))]
-                
-        except Exception as e:
+
+                return [
+                    types.TextContent(
+                        type="text", text=json.dumps(lifetime_data, indent=2)
+                    )
+                ]
+
+            except Exception as e:
                 error_response = {
                     "error": f"Failed to get lifetime measurements: {str(e)}",
                     "particle_name": particle_name,
                 }
-                return [types.TextContent(type="text", text=json.dumps(error_response, indent=2))]
-        
+                return [
+                    types.TextContent(
+                        type="text", text=json.dumps(error_response, indent=2)
+                    )
+                ]
+
         # Continue with other enhanced tool implementations...
         # [Additional tools would be implemented here with similar enhancement patterns]
-        
-            else:
+
+        else:
             error_response = {
                 "error": f"Unknown data tool: {name}",
                 "available_tools": [
-                    "get_mass_measurements", "get_lifetime_measurements", "get_width_measurements",
-                    "get_summary_values", "get_measurements_by_property", "convert_units",
+                    "get_mass_measurements",
+                    "get_lifetime_measurements",
+                    "get_width_measurements",
+                    "get_summary_values",
+                    "get_measurements_by_property",
+                    "convert_units",
                     # ... other tools
-                ]
+                ],
             }
-            return [types.TextContent(type="text", text=json.dumps(error_response, indent=2))]
-            
-        except Exception as e:
+            return [
+                types.TextContent(
+                    type="text", text=json.dumps(error_response, indent=2)
+                )
+            ]
+
+    except Exception as e:
         logger.error(f"Critical error in data tool {name}: {e}")
         error_response = {
             "critical_error": f"Tool execution failed: {str(e)}",
@@ -1022,6 +1130,8 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
                 "Verify particle name and parameters",
                 "Try simpler query parameters",
                 "Contact support if issue persists",
-            ]
+            ],
         }
-        return [types.TextContent(type="text", text=json.dumps(error_response, indent=2))]
+        return [
+            types.TextContent(type="text", text=json.dumps(error_response, indent=2))
+        ]

@@ -399,7 +399,9 @@ def get_particle_tools() -> List[types.Tool]:
     ]
 
 
-def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+def safe_get_attribute(
+    obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None
+) -> Any:
     """Safely get attribute from object with optional transformation and enhanced logging."""
     try:
         value = getattr(obj, attr, default)
@@ -411,7 +413,13 @@ def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func:
         return default
 
 
-def format_value_with_uncertainty(value: Any, error_pos: Any = None, error_neg: Any = None, units: str = "", precision: int = 6) -> Dict[str, Any]:
+def format_value_with_uncertainty(
+    value: Any,
+    error_pos: Any = None,
+    error_neg: Any = None,
+    units: str = "",
+    precision: int = 6,
+) -> Dict[str, Any]:
     """Format a physical value with its uncertainty and enhanced metadata."""
     try:
         result = {
@@ -420,32 +428,59 @@ def format_value_with_uncertainty(value: Any, error_pos: Any = None, error_neg: 
             "formatted": "N/A",
             "has_uncertainty": False,
         }
-        
+
         if result["value"] is not None:
             # Format main value
             if abs(result["value"]) < 1e-6 or abs(result["value"]) >= 10**precision:
                 value_str = f"{result['value']:.{precision-1}e}"
             else:
                 value_str = f"{result['value']:.{precision}g}"
-            
+
             # Handle uncertainties
             if error_pos is not None or error_neg is not None:
                 result["has_uncertainty"] = True
                 if error_pos == error_neg or error_neg is None:
-                    error_str = f"{error_pos:.{precision}g}" if error_pos is not None else "0"
+                    error_str = (
+                        f"{error_pos:.{precision}g}" if error_pos is not None else "0"
+                    )
                     result["formatted"] = f"{value_str} ± {error_str} {units}".strip()
-                    result["uncertainty"] = {"symmetric": float(error_pos) if error_pos is not None else 0}
-                    result["relative_uncertainty"] = abs(error_pos / result["value"]) if error_pos and result["value"] != 0 else 0
+                    result["uncertainty"] = {
+                        "symmetric": float(error_pos) if error_pos is not None else 0
+                    }
+                    result["relative_uncertainty"] = (
+                        abs(error_pos / result["value"])
+                        if error_pos and result["value"] != 0
+                        else 0
+                    )
                 else:
-                    pos_str = f"{error_pos:.{precision}g}" if error_pos is not None else "0"
-                    neg_str = f"{abs(error_neg):.{precision}g}" if error_neg is not None else "0"
-                    result["formatted"] = f"{value_str} +{pos_str}/-{neg_str} {units}".strip()
-                    result["uncertainty"] = {"positive": float(error_pos), "negative": float(error_neg)}
-                    avg_error = (abs(error_pos) + abs(error_neg)) / 2 if error_pos and error_neg else 0
-                    result["relative_uncertainty"] = avg_error / abs(result["value"]) if avg_error and result["value"] != 0 else 0
+                    pos_str = (
+                        f"{error_pos:.{precision}g}" if error_pos is not None else "0"
+                    )
+                    neg_str = (
+                        f"{abs(error_neg):.{precision}g}"
+                        if error_neg is not None
+                        else "0"
+                    )
+                    result["formatted"] = (
+                        f"{value_str} +{pos_str}/-{neg_str} {units}".strip()
+                    )
+                    result["uncertainty"] = {
+                        "positive": float(error_pos),
+                        "negative": float(error_neg),
+                    }
+                    avg_error = (
+                        (abs(error_pos) + abs(error_neg)) / 2
+                        if error_pos and error_neg
+                        else 0
+                    )
+                    result["relative_uncertainty"] = (
+                        avg_error / abs(result["value"])
+                        if avg_error and result["value"] != 0
+                        else 0
+                    )
             else:
                 result["formatted"] = f"{value_str} {units}".strip()
-        
+
         return result
     except Exception as e:
         logger.debug(f"Error formatting value: {e}")
@@ -456,16 +491,16 @@ def format_enhanced_quantum_numbers(particle: Any) -> Dict[str, Any]:
     """Enhanced quantum number formatting with comprehensive analysis."""
     try:
         quantum_numbers = {}
-        
+
         # Standard quantum number mappings with enhanced descriptions
         qn_mappings = {
             "J": ("quantum_J", "Total angular momentum", "spin"),
-            "P": ("quantum_P", "Parity", "intrinsic_parity"), 
+            "P": ("quantum_P", "Parity", "intrinsic_parity"),
             "C": ("quantum_C", "Charge conjugation parity", "c_parity"),
             "G": ("quantum_G", "G-parity", "g_parity"),
             "I": ("quantum_I", "Isospin", "isospin"),
         }
-        
+
         for symbol, (attr, description, alt_name) in qn_mappings.items():
             value = safe_get_attribute(particle, attr)
             if value is not None:
@@ -476,26 +511,36 @@ def format_enhanced_quantum_numbers(particle: Any) -> Dict[str, Any]:
                     "alternative_name": alt_name,
                     "numeric_value": value if isinstance(value, (int, float)) else None,
                 }
-                
+
                 # Add interpretation for specific quantum numbers
                 if symbol == "J" and isinstance(value, (int, float)):
                     if value == 0:
                         quantum_numbers[symbol]["interpretation"] = "scalar particle"
                     elif value == 0.5:
-                        quantum_numbers[symbol]["interpretation"] = "fermion (half-integer spin)"
+                        quantum_numbers[symbol][
+                            "interpretation"
+                        ] = "fermion (half-integer spin)"
                     elif value == 1:
                         quantum_numbers[symbol]["interpretation"] = "vector particle"
                     elif value % 1 == 0:
-                        quantum_numbers[symbol]["interpretation"] = "boson (integer spin)"
+                        quantum_numbers[symbol][
+                            "interpretation"
+                        ] = "boson (integer spin)"
                     else:
-                        quantum_numbers[symbol]["interpretation"] = "fermion (half-integer spin)"
-                
+                        quantum_numbers[symbol][
+                            "interpretation"
+                        ] = "fermion (half-integer spin)"
+
                 elif symbol == "P" and str(value) in ["+", "-", "1", "-1"]:
                     if str(value) in ["+", "1"]:
-                        quantum_numbers[symbol]["interpretation"] = "positive parity (even under spatial inversion)"
+                        quantum_numbers[symbol][
+                            "interpretation"
+                        ] = "positive parity (even under spatial inversion)"
                     else:
-                        quantum_numbers[symbol]["interpretation"] = "negative parity (odd under spatial inversion)"
-        
+                        quantum_numbers[symbol][
+                            "interpretation"
+                        ] = "negative parity (odd under spatial inversion)"
+
         # Calculate total quantum numbers summary
         quantum_summary = {
             "total_quantum_numbers": len(quantum_numbers),
@@ -505,13 +550,13 @@ def format_enhanced_quantum_numbers(particle: Any) -> Dict[str, Any]:
             "has_g_parity": "G" in quantum_numbers,
             "has_isospin": "I" in quantum_numbers,
         }
-        
+
         return {
             "quantum_numbers": quantum_numbers,
             "summary": quantum_summary,
             "jpc_notation": format_jpc_notation(quantum_numbers),
         }
-        
+
     except Exception as e:
         logger.error(f"Error formatting quantum numbers: {e}")
         return {"error": f"Failed to format quantum numbers: {str(e)}"}
@@ -523,31 +568,31 @@ def format_jpc_notation(quantum_numbers: Dict[str, Any]) -> Dict[str, Any]:
         j = quantum_numbers.get("J", {}).get("value", "?")
         p = quantum_numbers.get("P", {}).get("value", "?")
         c = quantum_numbers.get("C", {}).get("value", "?")
-        
+
         # Normalize parity notation
         if p in ["1", "+1"]:
             p = "+"
         elif p in ["-1"]:
             p = "-"
-        
-        # Normalize C-parity notation  
+
+        # Normalize C-parity notation
         if c in ["1", "+1"]:
             c = "+"
         elif c in ["-1"]:
             c = "-"
-        
+
         jpc_string = f"{j}"
         if p != "?":
             jpc_string += f"^{p}"
             if c != "?" and p != "?":
                 jpc_string += f"{c}"
-        
+
         return {
             "jpc_notation": jpc_string if jpc_string != "?" else "Unknown",
             "components": {"J": j, "P": p, "C": c},
             "is_complete": all(val != "?" for val in [j, p, c]),
         }
-        
+
     except Exception as e:
         logger.debug(f"Error formatting JPC notation: {e}")
         return {"jpc_notation": "Unknown", "error": str(e)}
@@ -572,7 +617,7 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
         is_composite = False
         constituents = None
         force_carrier = False
-        
+
         if classification["is_lepton"]:
             primary_type = "lepton"
             category = "fundamental"
@@ -596,7 +641,7 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
             category = "hadron"
             is_composite = True
             constituents = "quark-antiquark pair"
-        
+
         # Enhanced classification analysis
         enhanced_classification = {
             **classification,
@@ -607,7 +652,7 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
             "constituents": constituents,
             "is_force_carrier": force_carrier,
         }
-        
+
         # Additional properties analysis
         charge = safe_get_attribute(particle, "charge")
         if charge is not None:
@@ -617,16 +662,18 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
                 "is_charged": abs(charge) >= 0.1,
                 "charge_magnitude": abs(charge),
             }
-        
+
         # Mass properties
         mass = safe_get_attribute(particle, "mass")
         if mass is not None:
             enhanced_classification["mass_properties"] = {
                 "has_mass": mass > 0,
                 "is_massless": mass == 0,
-                "mass_scale": "heavy" if mass > 1.0 else "light" if mass > 0.1 else "very_light",
+                "mass_scale": (
+                    "heavy" if mass > 1.0 else "light" if mass > 0.1 else "very_light"
+                ),
             }
-        
+
         # Stability analysis
         lifetime = safe_get_attribute(particle, "lifetime")
         if lifetime is not None:
@@ -638,15 +685,15 @@ def format_enhanced_particle_classification(particle: Any) -> Dict[str, Any]:
                 stability = "short_lived"
             else:
                 stability = "very_short_lived"
-                
+
             enhanced_classification["stability"] = {
                 "lifetime": lifetime,
                 "classification": stability,
                 "is_stable": stability == "stable",
             }
-        
+
         return enhanced_classification
-        
+
     except Exception as e:
         logger.error(f"Error formatting particle classification: {e}")
         return {"error": f"Failed to format classification: {str(e)}"}
@@ -762,7 +809,7 @@ async def handle_particle_tools(
                     "mass": format_value_with_uncertainty(
                         safe_get_attribute(particle, "mass"),
                         safe_get_attribute(particle, "mass_error"),
-                        "GeV"
+                        "GeV",
                     ),
                     "classification": format_enhanced_particle_classification(particle),
                 }
@@ -790,9 +837,15 @@ async def handle_particle_tools(
                 "pdgid": safe_get_attribute(particle, "pdgid", "N/A"),
                 "classification": format_enhanced_particle_classification(particle),
                 "has_entries": {
-                    "has_mass_entry": safe_get_attribute(particle, "has_mass_entry", False),
-                    "has_lifetime_entry": safe_get_attribute(particle, "has_lifetime_entry", False),
-                    "has_width_entry": safe_get_attribute(particle, "has_width_entry", False),
+                    "has_mass_entry": safe_get_attribute(
+                        particle, "has_mass_entry", False
+                    ),
+                    "has_lifetime_entry": safe_get_attribute(
+                        particle, "has_lifetime_entry", False
+                    ),
+                    "has_width_entry": safe_get_attribute(
+                        particle, "has_width_entry", False
+                    ),
                 },
             }
 

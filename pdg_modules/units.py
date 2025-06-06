@@ -390,7 +390,9 @@ COMMON_CONVERSIONS = {
 }
 
 
-def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+def safe_get_attribute(
+    obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None
+) -> Any:
     """Safely get attribute from object with optional transformation and enhanced logging."""
     try:
         value = getattr(obj, attr, default)
@@ -414,13 +416,26 @@ def get_unit_type(unit: str) -> str:
             return "length"
         elif base_unit == "kg":
             return "mass"
-    
+
     # Additional unit type detection
     energy_units = ["eV", "keV", "MeV", "GeV", "TeV", "PeV", "J", "erg"]
-    time_units = ["s", "ms", "us", "μs", "ns", "ps", "fs", "yr", "year", "day", "hr", "min"]
+    time_units = [
+        "s",
+        "ms",
+        "us",
+        "μs",
+        "ns",
+        "ps",
+        "fs",
+        "yr",
+        "year",
+        "day",
+        "hr",
+        "min",
+    ]
     length_units = ["m", "km", "cm", "mm", "μm", "nm", "pm", "fm", "Å"]
     mass_units = ["kg", "g", "mg", "u", "amu"]
-    
+
     if unit in energy_units:
         return "energy"
     elif unit in time_units:
@@ -429,7 +444,7 @@ def get_unit_type(unit: str) -> str:
         return "length"
     elif unit in mass_units:
         return "mass"
-    
+
     return "unknown"
 
 
@@ -437,7 +452,7 @@ def get_dimensional_analysis(unit: str) -> Dict[str, Any]:
     """Perform dimensional analysis for a unit."""
     try:
         unit_type = get_unit_type(unit)
-        
+
         analysis = {
             "unit": unit,
             "type": unit_type,
@@ -445,55 +460,83 @@ def get_dimensional_analysis(unit: str) -> Dict[str, Any]:
             "si_base_units": {},
             "natural_units_relation": None,
         }
-        
+
         # Define dimensional formulas
         if unit_type == "energy":
             analysis["dimensional_formula"] = "M L² T⁻²"
             analysis["si_base_units"] = {"kg": 1, "m": 2, "s": -2}
-            analysis["natural_units_relation"] = "In natural units (ħ=c=1), energy has dimension of inverse length"
+            analysis["natural_units_relation"] = (
+                "In natural units (ħ=c=1), energy has dimension of inverse length"
+            )
         elif unit_type == "time":
             analysis["dimensional_formula"] = "T"
             analysis["si_base_units"] = {"s": 1}
-            analysis["natural_units_relation"] = "In natural units, time has dimension of length"
+            analysis["natural_units_relation"] = (
+                "In natural units, time has dimension of length"
+            )
         elif unit_type == "length":
             analysis["dimensional_formula"] = "L"
             analysis["si_base_units"] = {"m": 1}
-            analysis["natural_units_relation"] = "In natural units, length has dimension of inverse energy"
+            analysis["natural_units_relation"] = (
+                "In natural units, length has dimension of inverse energy"
+            )
         elif unit_type == "mass":
             analysis["dimensional_formula"] = "M"
             analysis["si_base_units"] = {"kg": 1}
-            analysis["natural_units_relation"] = "In natural units (c=1), mass has dimension of energy"
-        
+            analysis["natural_units_relation"] = (
+                "In natural units (c=1), mass has dimension of energy"
+            )
+
         return analysis
-        
+
     except Exception as e:
         logger.error(f"Error in dimensional analysis for {unit}: {e}")
         return {"error": f"Failed dimensional analysis: {str(e)}"}
 
 
-def calculate_uncertainty_propagation(value: float, error: float, conversion_factor: float) -> Dict[str, Any]:
+def calculate_uncertainty_propagation(
+    value: float, error: float, conversion_factor: float
+) -> Dict[str, Any]:
     """Calculate uncertainty propagation in unit conversions."""
     try:
         converted_value = value * conversion_factor
         converted_error = error * abs(conversion_factor)  # Linear propagation
-        
+
         # Relative uncertainty should be preserved
         relative_error_original = error / abs(value) if value != 0 else 0
-        relative_error_converted = converted_error / abs(converted_value) if converted_value != 0 else 0
-        
+        relative_error_converted = (
+            converted_error / abs(converted_value) if converted_value != 0 else 0
+        )
+
         return {
-            "original": {"value": value, "error": error, "relative_error": relative_error_original},
-            "converted": {"value": converted_value, "error": converted_error, "relative_error": relative_error_converted},
-            "uncertainty_preserved": abs(relative_error_original - relative_error_converted) < 1e-10,
+            "original": {
+                "value": value,
+                "error": error,
+                "relative_error": relative_error_original,
+            },
+            "converted": {
+                "value": converted_value,
+                "error": converted_error,
+                "relative_error": relative_error_converted,
+            },
+            "uncertainty_preserved": abs(
+                relative_error_original - relative_error_converted
+            )
+            < 1e-10,
             "conversion_factor": conversion_factor,
         }
-        
+
     except Exception as e:
         logger.error(f"Error in uncertainty propagation: {e}")
         return {"error": f"Failed uncertainty propagation: {str(e)}"}
 
 
-def format_value_with_units(value: float, uncertainty: Optional[float] = None, units: str = "", precision: int = 6) -> Dict[str, Any]:
+def format_value_with_units(
+    value: float,
+    uncertainty: Optional[float] = None,
+    units: str = "",
+    precision: int = 6,
+) -> Dict[str, Any]:
     """Format a value with units and optional uncertainty."""
     try:
         result = {
@@ -502,20 +545,24 @@ def format_value_with_units(value: float, uncertainty: Optional[float] = None, u
             "formatted": f"{value:.{precision}g}",
             "scientific_notation": f"{value:.{precision-1}e}",
         }
-        
+
         if uncertainty is not None:
-            result.update({
-                "uncertainty": uncertainty,
-                "relative_uncertainty": uncertainty / abs(value) if value != 0 else float('inf'),
-                "formatted_with_error": f"({value:.{precision}g} ± {uncertainty:.{precision}g}) {units}".strip(),
-            })
-            
+            result.update(
+                {
+                    "uncertainty": uncertainty,
+                    "relative_uncertainty": (
+                        uncertainty / abs(value) if value != 0 else float("inf")
+                    ),
+                    "formatted_with_error": f"({value:.{precision}g} ± {uncertainty:.{precision}g}) {units}".strip(),
+                }
+            )
+
             # Determine appropriate significant figures from uncertainty
             if uncertainty > 0:
                 error_magnitude = math.floor(math.log10(uncertainty))
                 sig_figs = max(1, precision + error_magnitude)
                 result["recommended_precision"] = min(sig_figs, 10)
-        
+
         # Add unit information if available
         if units in UNIT_CONVERSION_FACTORS:
             factor, base_unit = UNIT_CONVERSION_FACTORS[units]
@@ -524,9 +571,9 @@ def format_value_with_units(value: float, uncertainty: Optional[float] = None, u
                 "conversion_factor": factor,
                 "unit_type": get_unit_type(units),
             }
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(f"Error formatting value with units: {e}")
         return {"error": f"Failed to format value: {str(e)}"}
@@ -544,54 +591,56 @@ def enhanced_unit_validation(unit1: str, unit2: str) -> Dict[str, Any]:
             "conversion_possible": False,
             "alternative_suggestions": [],
         }
-        
+
         # Check if units exist
         unit1_exists = unit1 in UNIT_CONVERSION_FACTORS
         unit2_exists = unit2 in UNIT_CONVERSION_FACTORS
-        
+
         if not unit1_exists:
             validation["reason"] = f"Unit '{unit1}' not recognized"
             validation["alternative_suggestions"] = find_similar_units(unit1)
             return validation
-            
+
         if not unit2_exists:
             validation["reason"] = f"Unit '{unit2}' not recognized"
             validation["alternative_suggestions"] = find_similar_units(unit2)
             return validation
-        
+
         # Get unit types
         type1 = get_unit_type(unit1)
         type2 = get_unit_type(unit2)
-        
+
         validation["dimensional_analysis"] = {
             "unit1_type": type1,
             "unit2_type": type2,
             "unit1_analysis": get_dimensional_analysis(unit1),
             "unit2_analysis": get_dimensional_analysis(unit2),
         }
-        
+
         if type1 == type2 and type1 != "unknown":
             validation["compatible"] = True
             validation["conversion_possible"] = True
             validation["reason"] = f"Both units are {type1} units"
-            
+
             # Calculate conversion factor
             factor1, base1 = UNIT_CONVERSION_FACTORS[unit1]
             factor2, base2 = UNIT_CONVERSION_FACTORS[unit2]
             conversion_factor = factor1 / factor2
-            
+
             validation["conversion_factor"] = conversion_factor
-            validation["conversion_example"] = f"1 {unit1} = {conversion_factor} {unit2}"
-            
+            validation["conversion_example"] = (
+                f"1 {unit1} = {conversion_factor} {unit2}"
+            )
+
         else:
             validation["reason"] = f"Cannot convert between {type1} and {type2} units"
             validation["alternative_suggestions"] = [
                 f"For {type1} units, consider: {', '.join(get_units_by_type(type1)[:5])}",
-                f"For {type2} units, consider: {', '.join(get_units_by_type(type2)[:5])}"
+                f"For {type2} units, consider: {', '.join(get_units_by_type(type2)[:5])}",
             ]
-        
+
         return validation
-        
+
     except Exception as e:
         logger.error(f"Error in enhanced unit validation: {e}")
         return {"error": f"Validation failed: {str(e)}"}
@@ -602,37 +651,49 @@ def find_similar_units(unit: str, max_suggestions: int = 5) -> List[str]:
     try:
         suggestions = []
         unit_lower = unit.lower()
-        
+
         # Exact match check
         for known_unit in UNIT_CONVERSION_FACTORS.keys():
             if known_unit.lower() == unit_lower:
                 return [known_unit]
-        
+
         # Partial match
         for known_unit in UNIT_CONVERSION_FACTORS.keys():
             if unit_lower in known_unit.lower() or known_unit.lower() in unit_lower:
                 suggestions.append(known_unit)
-        
+
         # Common typos and alternatives
         unit_alternatives = {
-            "gev": ["GeV"], "mev": ["MeV"], "kev": ["keV"], "tev": ["TeV"],
-            "sec": ["s"], "second": ["s"], "seconds": ["s"],
-            "nano": ["ns"], "nanosecond": ["ns"], "nanoseconds": ["ns"],
-            "pico": ["ps"], "picosecond": ["ps"], "picoseconds": ["ps"],
-            "micro": ["μs", "us"], "microsecond": ["μs", "us"],
-            "year": ["yr", "years"], "years": ["yr", "year"],
-            "amu": ["u"], "atomic": ["u"],
+            "gev": ["GeV"],
+            "mev": ["MeV"],
+            "kev": ["keV"],
+            "tev": ["TeV"],
+            "sec": ["s"],
+            "second": ["s"],
+            "seconds": ["s"],
+            "nano": ["ns"],
+            "nanosecond": ["ns"],
+            "nanoseconds": ["ns"],
+            "pico": ["ps"],
+            "picosecond": ["ps"],
+            "picoseconds": ["ps"],
+            "micro": ["μs", "us"],
+            "microsecond": ["μs", "us"],
+            "year": ["yr", "years"],
+            "years": ["yr", "year"],
+            "amu": ["u"],
+            "atomic": ["u"],
         }
-        
+
         for alt, replacements in unit_alternatives.items():
             if alt in unit_lower:
                 suggestions.extend(replacements)
-        
+
         # Remove duplicates and limit results
         suggestions = list(set(suggestions))[:max_suggestions]
-        
+
         return suggestions
-        
+
     except Exception as e:
         logger.debug(f"Error finding similar units: {e}")
         return []
@@ -734,8 +795,12 @@ async def handle_units_tools(
                                     "input_value": value,
                                     "from_units": from_units,
                                     "to_units": to_units,
-                                    "suggestions": validation.get("alternative_suggestions", []),
-                                    "dimensional_analysis": validation.get("dimensional_analysis", {}),
+                                    "suggestions": validation.get(
+                                        "alternative_suggestions", []
+                                    ),
+                                    "dimensional_analysis": validation.get(
+                                        "dimensional_analysis", {}
+                                    ),
                                 },
                                 indent=2,
                             ),
@@ -744,7 +809,10 @@ async def handle_units_tools(
 
             # Perform enhanced conversion
             converted_value = convert_units_pdg(value, from_units, to_units)
-            conversion_factor = UNIT_CONVERSION_FACTORS[from_units][0] / UNIT_CONVERSION_FACTORS[to_units][0]
+            conversion_factor = (
+                UNIT_CONVERSION_FACTORS[from_units][0]
+                / UNIT_CONVERSION_FACTORS[to_units][0]
+            )
 
             result = {
                 "original": format_value_with_units(value, units=from_units),
@@ -757,7 +825,7 @@ async def handle_units_tools(
                     "dimensional_analysis": get_dimensional_analysis(from_units),
                 },
             }
-            
+
             # Add reverse conversion for convenience
             result["reverse_conversion"] = {
                 "factor": 1 / conversion_factor,
@@ -894,26 +962,35 @@ async def handle_units_tools(
         try:
             # Use enhanced validation
             validation_result = enhanced_unit_validation(unit1, unit2)
-            
+
             result = {
                 "unit1": unit1,
                 "unit2": unit2,
                 "compatible": validation_result["compatible"],
                 "reason": validation_result["reason"],
-                "conversion_possible": validation_result.get("conversion_possible", False),
+                "conversion_possible": validation_result.get(
+                    "conversion_possible", False
+                ),
             }
-            
+
             # Add detailed dimensional analysis
             if "dimensional_analysis" in validation_result:
-                result["dimensional_analysis"] = validation_result["dimensional_analysis"]
-            
+                result["dimensional_analysis"] = validation_result[
+                    "dimensional_analysis"
+                ]
+
             # Add conversion information if compatible
             if validation_result["compatible"]:
                 result["conversion_factor"] = validation_result.get("conversion_factor")
-                result["conversion_example"] = validation_result.get("conversion_example")
-                
+                result["conversion_example"] = validation_result.get(
+                    "conversion_example"
+                )
+
                 # Add enhanced conversion metadata
-                if unit1 in UNIT_CONVERSION_FACTORS and unit2 in UNIT_CONVERSION_FACTORS:
+                if (
+                    unit1 in UNIT_CONVERSION_FACTORS
+                    and unit2 in UNIT_CONVERSION_FACTORS
+                ):
                     result["conversion_metadata"] = {
                         "unit1_info": format_unit_info(unit1),
                         "unit2_info": format_unit_info(unit2),
@@ -921,13 +998,17 @@ async def handle_units_tools(
                     }
             else:
                 # Add suggestions for incompatible units
-                result["suggestions"] = validation_result.get("alternative_suggestions", [])
-                
+                result["suggestions"] = validation_result.get(
+                    "alternative_suggestions", []
+                )
+
                 # Add unit type information for clarity
                 result["unit_types"] = {
                     "unit1": get_unit_type(unit1),
                     "unit2": get_unit_type(unit2),
-                    "available_types": list(set(get_unit_type(u) for u in UNIT_CONVERSION_FACTORS.keys())),
+                    "available_types": list(
+                        set(get_unit_type(u) for u in UNIT_CONVERSION_FACTORS.keys())
+                    ),
                 }
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
