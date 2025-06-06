@@ -1131,4 +1131,3 @@ async def handle_data_tools(name: str, arguments: dict, api) -> List[types.TextC
         return [
             types.TextContent(type="text", text=json.dumps(error_response, indent=2))
         ]
-
