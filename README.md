@@ -4,38 +4,81 @@ A **Model Context Protocol (MCP) server** that provides seamless access to parti
 
 ## Quick Installation
 
-### Option 1: uvx (Recommended)
-```bash
-uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server
-```
-
-### Option 2: Direct Installation
+### Option 1: Direct Python Script (Recommended for Local Development)
 ```bash
 git clone https://github.com/uzerone/ParticlePhysics-MCP-Server.git
 cd ParticlePhysics-MCP-Server
 pip install -r requirements.txt
-python pp_mcp_server.py
 ```
 
-### Option 3: Development Setup
+### Option 2: Development Installation
 ```bash
 git clone https://github.com/uzerone/ParticlePhysics-MCP-Server.git
 cd ParticlePhysics-MCP-Server
 pip install -e .
 ```
 
-## MCP Configuration
+## MCP Configuration for Claude Desktop
+
+Choose the configuration method that works best for your setup:
+
+### Method 1: Absolute Path (Most Reliable)
+Add this to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "particlephysics": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git", "pp-mcp-server"]
+      "command": "python",
+      "args": ["/ABSOLUTE/PATH/TO/ParticlePhysics-MCP-Server/pp_mcp_server.py"]
     }
   }
 }
 ```
+
+**Note**: Replace `/ABSOLUTE/PATH/TO/` with your actual path. For example:
+- macOS: `/Users/username/Documents/ParticlePhysics-MCP-Server/pp_mcp_server.py`
+- Windows: `C:\\Users\\username\\Documents\\ParticlePhysics-MCP-Server\\pp_mcp_server.py`
+- Linux: `/home/username/ParticlePhysics-MCP-Server/pp_mcp_server.py`
+
+### Method 2: Python Module (After Installation)
+If you've installed the package with `pip install -e .`:
+
+```json
+{
+  "mcpServers": {
+    "particlephysics": {
+      "command": "python",
+      "args": ["-m", "pp_mcp_server"]
+    }
+  }
+}
+```
+
+### Method 3: Working Directory Method
+```json
+{
+  "mcpServers": {
+    "particlephysics": {
+      "command": "python",
+      "args": ["pp_mcp_server.py"],
+      "cwd": "/ABSOLUTE/PATH/TO/ParticlePhysics-MCP-Server"
+    }
+  }
+}
+```
+
+## Configuration File Locations
+
+The Claude Desktop configuration file should be placed at:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+After updating the configuration:
+1. Save the file
+2. Restart Claude Desktop
+3. Look for the tools icon in Claude to verify the server is connected
 
 ## Usage Examples
 

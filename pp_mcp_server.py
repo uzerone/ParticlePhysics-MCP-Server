@@ -158,5 +158,5 @@ if __name__ == "__main__":
     logger.info(
         "Available modules: api, data, decay, errors, measurement, particle, units, utils"
     )
-    logger.info("Total tools available: 64 across 8 modules")
+    logger.info("Total tools available: 60 across 8 modules")
     run_server()

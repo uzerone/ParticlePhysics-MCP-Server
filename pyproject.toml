@@ -58,6 +58,9 @@ pp-mcp-server = "pp_mcp_server:run_server"
 [tool.setuptools.packages.find]
 include = ["modules*"]
 
+[tool.setuptools]
+py-modules = ["pp_mcp_server"]
+
 [tool.black]
 line-length = 88
 target-version = ['py310']
