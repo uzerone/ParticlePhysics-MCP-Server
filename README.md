@@ -116,19 +116,11 @@ python -c "import pdg; print('✓ PDG API ready')"
 - **PDG Python API** (automatically installed)
 - **MCP Framework** (for AI assistant integration)
 
-## Authors
+## Maintainers
 
-**PDG MCP Server Team**
-- Primary development and architecture
-- Enhanced MCP integration and tool design
-- Comprehensive testing and documentation
-
-**Contributors**
-- Community feedback and improvements
-- Bug reports and feature requests
-- Documentation enhancements
-
-Built with ❤️ for the particle physics and AI community.
+This project is maintained by:
+- [@uzerone](https://github.com/uzerone)
+- [@bee4come](https://github.com/bee4come)
 
 ## License
 
