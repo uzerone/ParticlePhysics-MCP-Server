@@ -36,7 +36,7 @@ jobs:
       run: |
         python -c "
         import json
-        configs = ['mcp-server.json', 'mcp-config-easy.json']
+        configs = ['mcp-server.json']
         for config in configs:
             try:
                 with open(config) as f:
@@ -122,34 +122,33 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Validate all JSON configurations
+    - name: Validate JSON configuration
       run: |
         python -c "
         import json
         import os
         
-        configs = ['mcp-server.json', 'mcp-config-easy.json']
+        config_file = 'mcp-server.json'
         
-        for config_file in configs:
-            if os.path.exists(config_file):
-                try:
-                    with open(config_file, 'r') as f:
-                        data = json.load(f)
-                    print(f'✅ {config_file}: Valid JSON')
-                    
-                    # Validate MCP server structure
-                    if config_file == 'mcp-server.json':
-                        assert 'mcpServers' in data, 'Missing mcpServers key'
-                        assert 'particlephysics' in data['mcpServers'], 'Missing particlephysics server'
-                        server = data['mcpServers']['particlephysics']
-                        assert 'command' in server, 'Missing command'
-                        assert 'args' in server, 'Missing args'
-                        assert server['command'] == 'uvx', 'Expected uvx command'
-                        print(f'✅ {config_file}: Valid MCP structure')
-                    
-                except Exception as e:
-                    print(f'❌ {config_file}: {e}')
-                    exit(1)
-            else:
-                print(f'⚠️  {config_file}: File not found')
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    data = json.load(f)
+                print(f'✅ {config_file}: Valid JSON')
+                
+                # Validate MCP server structure
+                assert 'mcpServers' in data, 'Missing mcpServers key'
+                assert 'particlephysics' in data['mcpServers'], 'Missing particlephysics server'
+                server = data['mcpServers']['particlephysics']
+                assert 'command' in server, 'Missing command'
+                assert 'args' in server, 'Missing args'
+                assert server['command'] == 'uvx', 'Expected uvx command'
+                print(f'✅ {config_file}: Valid MCP structure')
+                
+            except Exception as e:
+                print(f'❌ {config_file}: {e}')
+                exit(1)
+        else:
+            print(f'❌ {config_file}: File not found')
+            exit(1)
         " 
