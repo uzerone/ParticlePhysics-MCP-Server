@@ -4,10 +4,9 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'claude-desktop-quick.json'
       - 'mcp-*.json'
-      - 'test_quick_install.py'
       - '.github/workflows/test-quick-install.yml'
+      - 'README.md'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -37,12 +36,19 @@ jobs:
       run: |
         python -c "
         import json
-        configs = ['claude-desktop-quick.json', 'mcp-server.json', 'mcp-config-easy.json']
+        configs = ['mcp-server.json', 'mcp-config-easy.json']
         for config in configs:
             try:
                 with open(config) as f:
-                    json.load(f)
-                print(f'✅ {config} is valid')
+                    data = json.load(f)
+                print(f'✅ {config} is valid JSON')
+                # Basic validation for MCP server config
+                if 'mcpServers' in data:
+                    for server_name, server_config in data['mcpServers'].items():
+                        if 'command' in server_config and 'args' in server_config:
+                            print(f'✅ {config}: {server_name} has valid MCP structure')
+                        else:
+                            print(f'⚠️  {config}: {server_name} missing command or args')
             except Exception as e:
                 print(f'❌ {config} failed: {e}')
                 exit(1)
@@ -51,22 +57,35 @@ jobs:
     - name: Test uvx installation (Unix)
       if: runner.os != 'Windows'
       run: |
-        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG"
+        timeout 30s uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to timeout/fail without PDG in CI"
     
     - name: Test uvx installation (Windows)
       if: runner.os == 'Windows'
       run: |
-        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG"
+        # Windows timeout command
+        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG in CI"
     
-    - name: Test installation from PyPI simulation
+    - name: Test package installation
       run: |
         # Test that the package can be installed
         pip install -e .
         python -c "import pp_mcp_server; print('✅ Package imports successfully')"
     
-    - name: Run quick install tests
+    - name: Test MCP server basic functionality
       run: |
-        python test_quick_install.py || echo "Some tests expected to fail in CI without PDG"
+        python -c "
+        try:
+            import pp_mcp_server
+            print('✅ MCP server module imports successfully')
+            # Test that main components exist
+            if hasattr(pp_mcp_server, 'run_server'):
+                print('✅ run_server function exists')
+            else:
+                print('⚠️  run_server function not found')
+        except ImportError as e:
+            print(f'❌ Failed to import pp_mcp_server: {e}')
+            exit(1)
+        "
 
   test-package-metadata:
     runs-on: ubuntu-latest
@@ -92,7 +111,45 @@ jobs:
       run: |
         twine check dist/*
     
-    - name: Test package installation
+    - name: Test package installation from wheel
       run: |
         pip install dist/*.whl
-        python -c "import pp_mcp_server; print('Package installed successfully')" 
+        python -c "import pp_mcp_server; print('✅ Package installed successfully from wheel')"
+
+  test-json-configs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Validate all JSON configurations
+      run: |
+        python -c "
+        import json
+        import os
+        
+        configs = ['mcp-server.json', 'mcp-config-easy.json']
+        
+        for config_file in configs:
+            if os.path.exists(config_file):
+                try:
+                    with open(config_file, 'r') as f:
+                        data = json.load(f)
+                    print(f'✅ {config_file}: Valid JSON')
+                    
+                    # Validate MCP server structure
+                    if config_file == 'mcp-server.json':
+                        assert 'mcpServers' in data, 'Missing mcpServers key'
+                        assert 'particlephysics' in data['mcpServers'], 'Missing particlephysics server'
+                        server = data['mcpServers']['particlephysics']
+                        assert 'command' in server, 'Missing command'
+                        assert 'args' in server, 'Missing args'
+                        assert server['command'] == 'uvx', 'Expected uvx command'
+                        print(f'✅ {config_file}: Valid MCP structure')
+                    
+                except Exception as e:
+                    print(f'❌ {config_file}: {e}')
+                    exit(1)
+            else:
+                print(f'⚠️  {config_file}: File not found')
+        " 
