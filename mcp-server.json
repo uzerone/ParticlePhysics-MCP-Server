@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "particlephysics": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+        "pp-mcp-server"
+      ],
+      "env": {
+        "PDG_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+} 

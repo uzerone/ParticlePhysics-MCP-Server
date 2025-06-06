@@ -1,0 +1,88 @@
+{
+  "name": "ParticlePhysics MCP Server Easy Config",
+  "description": "Easy-to-use configuration for Particle Physics MCP Server without local installation",
+  "version": "1.0.0",
+  "installation_methods": {
+    "method_1_uvx": {
+      "description": "Using uvx (recommended for Python tools)",
+      "mcpServers": {
+        "particlephysics": {
+          "command": "uvx",
+          "args": [
+            "--from",
+            "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+            "pp-mcp-server"
+          ]
+        }
+      }
+    },
+    "method_2_npx": {
+      "description": "Using npx with Python runner",
+      "mcpServers": {
+        "particlephysics": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "pyrunner",
+            "--",
+            "python",
+            "-m",
+            "pip",
+            "install",
+            "-q",
+            "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+            "&&",
+            "pp-mcp-server"
+          ]
+        }
+      }
+    },
+    "method_3_pipx": {
+      "description": "Using pipx for isolated installation",
+      "mcpServers": {
+        "particlephysics": {
+          "command": "pipx",
+          "args": [
+            "run",
+            "--spec",
+            "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+            "pp-mcp-server"
+          ]
+        }
+      }
+    },
+    "method_4_docker": {
+      "description": "Using Docker container (if available)",
+      "mcpServers": {
+        "particlephysics": {
+          "command": "docker",
+          "args": [
+            "run",
+            "--rm",
+            "-i",
+            "ghcr.io/uzerone/particlephysics-mcp-server:latest"
+          ]
+        }
+      }
+    }
+  },
+  "claude_desktop_config": {
+    "description": "Copy one of the methods above into your claude_desktop_config.json",
+    "location": {
+      "macos": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "windows": "%APPDATA%\\Claude\\claude_desktop_config.json"
+    },
+    "example": {
+      "mcpServers": {
+        "particlephysics": {
+          "command": "uvx",
+          "args": [
+            "--from",
+            "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+            "pp-mcp-server"
+          ]
+        }
+      }
+    }
+  }
+} 

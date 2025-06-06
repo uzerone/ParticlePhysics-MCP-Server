@@ -2,6 +2,34 @@
 
 A **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). This production-ready server enables AI assistants and applications to query comprehensive particle physics information through 60 specialized tools across 8 modules with enterprise-grade security, caching, and performance features.
 
+## 🚀 One-Click Installation (No Local Setup Required!)
+
+### For Claude Desktop Users:
+Simply add this to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "particlephysics": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
+        "pp-mcp-server"
+      ]
+    }
+  }
+}
+```
+
+**That's it!** No local installation needed. The server will be automatically downloaded and run when needed.
+
+### Alternative Methods:
+- **Using pipx**: Replace `"command": "uvx"` with `"command": "pipx"` and `"args": ["run", "--spec", "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git", "pp-mcp-server"]`
+- **Download JSON Config**: Get our pre-configured [claude-desktop-quick.json](claude-desktop-quick.json) file
+
+📖 **[See QUICK_START.md for detailed setup instructions →](QUICK_START.md)**
+
 ## Quick Installation
 
 ### Option 1: Direct Python Script (Recommended for Local Development)

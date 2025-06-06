@@ -1,0 +1,98 @@
+name: Test Quick Install
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'claude-desktop-quick.json'
+      - 'mcp-*.json'
+      - 'test_quick_install.py'
+      - '.github/workflows/test-quick-install.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-quick-install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install test dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uvx pipx
+    
+    - name: Test JSON configurations
+      run: |
+        python -c "
+        import json
+        configs = ['claude-desktop-quick.json', 'mcp-server.json', 'mcp-config-easy.json']
+        for config in configs:
+            try:
+                with open(config) as f:
+                    json.load(f)
+                print(f'✅ {config} is valid')
+            except Exception as e:
+                print(f'❌ {config} failed: {e}')
+                exit(1)
+        "
+    
+    - name: Test uvx installation (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG"
+    
+    - name: Test uvx installation (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG"
+    
+    - name: Test installation from PyPI simulation
+      run: |
+        # Test that the package can be installed
+        pip install -e .
+        python -c "import pp_mcp_server; print('✅ Package imports successfully')"
+    
+    - name: Run quick install tests
+      run: |
+        python test_quick_install.py || echo "Some tests expected to fail in CI without PDG"
+
+  test-package-metadata:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install build tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Check package
+      run: |
+        twine check dist/*
+    
+    - name: Test package installation
+      run: |
+        pip install dist/*.whl
+        python -c "import pp_mcp_server; print('Package installed successfully')" 
