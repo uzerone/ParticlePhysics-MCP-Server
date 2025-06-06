@@ -11,8 +11,10 @@ Simply add this to your `claude_desktop_config.json`:
 {
   "mcpServers": {
     "particlephysics": {
-      "command": "uvx",
+      "command": "uv",
       "args": [
+        "tool",
+        "run",
         "--from",
         "git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git",
         "pp-mcp-server"

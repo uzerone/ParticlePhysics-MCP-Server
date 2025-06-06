@@ -30,7 +30,7 @@ jobs:
     - name: Install test dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install uvx pipx
+        pip install uv pipx
     
     - name: Test JSON configurations
       run: |
@@ -57,13 +57,13 @@ jobs:
     - name: Test uvx installation (Unix)
       if: runner.os != 'Windows'
       run: |
-        timeout 30s uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to timeout/fail without PDG in CI"
+        timeout 30s uv tool run --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to timeout/fail without PDG in CI"
     
     - name: Test uvx installation (Windows)
       if: runner.os == 'Windows'
       run: |
         # Windows timeout command
-        uvx --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG in CI"
+        uv tool run --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG in CI"
     
     - name: Test package installation
       run: |
@@ -142,7 +142,7 @@ jobs:
                 server = data['mcpServers']['particlephysics']
                 assert 'command' in server, 'Missing command'
                 assert 'args' in server, 'Missing args'
-                assert server['command'] == 'uvx', 'Expected uvx command'
+                assert server['command'] == 'uv', 'Expected uv command'
                 print(f'✅ {config_file}: Valid MCP structure')
                 
             except Exception as e:
