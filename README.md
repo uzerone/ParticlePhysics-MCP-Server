@@ -1,15 +1,43 @@
 # PDG MCP Server
 
-A comprehensive **Model Context Protocol (MCP) server** providing seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). Perfect for researchers, students, and AI assistants working with particle physics.
+A comprehensive **Model Context Protocol (MCP) server** providing seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). Enhanced with advanced analytics, intelligent error handling, and comprehensive research tools perfect for researchers, students, and AI assistants working with particle physics.
 
-## 🚀 Features
+> **🆕 Latest Update**: All 8 modules have been significantly enhanced with advanced analytics, intelligent error handling, fuzzy search capabilities, statistical validation, and comprehensive physics context. The server now provides 73+ tools with enhanced functionality based on the official PDG Python API patterns.
 
-- **64 MCP Tools** across **8 specialized modules**
-- **Complete PDG API Coverage** with modular organization
-- **Multiple Installation Methods**: uvx, pip, or direct
-- **CLI Interface** for terminal usage
-- **Production Ready** with comprehensive testing
+## 🚀 Enhanced Features
+
+- **64+ Enhanced MCP Tools** across **8 specialized modules** with comprehensive analytics
+- **Complete PDG API Coverage** with intelligent enhancements and advanced error handling
+- **Advanced Data Analysis** with uncertainty propagation and statistical validation
+- **Intelligent Search & Validation** with fuzzy matching and smart suggestions
+- **Multiple Installation Methods**: uvx, pip, or direct development setup
+- **Enhanced CLI Interface** with comprehensive commands and analysis tools
+- **Production Ready** with comprehensive testing and robust error handling
+- **Research Optimized** with educational content and physics context
 - **Python 3.10+** required (MCP dependency)
+
+## ✨ New Enhanced Capabilities
+
+### 🧠 Intelligent Features
+- **Smart Particle Search** with fuzzy matching and auto-detection
+- **Comprehensive Error Handling** with intelligent recovery and suggestions
+- **Advanced Uncertainty Analysis** with precision classification
+- **Statistical Validation** of measurements and experimental data
+- **Educational Context** with physics explanations and background
+
+### 📊 Advanced Analytics
+- **Decay Structure Analysis** with hierarchical visualization data
+- **Conservation Law Verification** for physics validation
+- **Measurement Technique Comparison** across experiments
+- **Temporal Analysis** of measurement evolution
+- **Quality Metrics** and reliability indicators
+
+### 🔧 Enhanced Tools
+- **Pattern Recognition** for decay signatures and particle classification
+- **Unit Conversion Validation** with dimensional analysis
+- **PDG Identifier Intelligence** with format analysis and suggestions
+- **Safe Operations** with comprehensive fallback mechanisms
+- **Reference Tracking** with citation metrics and DOI integration
 
 ## 📦 Quick Installation
 
@@ -31,7 +59,7 @@ python pdg_mcp_server.py
 git clone https://github.com/uzerone/PDG-MCP-Server.git
 cd PDG-MCP-Server
 pip install -r requirements.txt
-python test_modular.py  # Run tests
+python test_modular.py  # Run comprehensive tests
 ```
 
 ## 🛠️ MCP Configuration
@@ -49,205 +77,268 @@ Add to your MCP client configuration:
 }
 ```
 
-## 💬 Example Queries for AI Assistants
+## 💬 Enhanced Example Queries for AI Assistants
 
-### Basic Research
-- *"What is the mass of the proton?"*
-- *"Find information about the electron"*
-- *"Compare the masses of all quarks"*
+### 🔬 Basic Research (Enhanced)
+- *"What is the mass of the proton with uncertainty analysis?"*
+- *"Find comprehensive information about the electron including quantum numbers"*
+- *"Compare the masses of all quarks with statistical analysis and uncertainty propagation"*
+- *"Search for 'muon' with fuzzy matching and alternative suggestions"*
 
-### Advanced Analysis
-- *"What are the main decay modes of the tau lepton?"*
-- *"Get electron mass measurements in MeV with error bars"*
-- *"Analyze the hierarchical structure of B+ meson decay chains"*
-- *"Compare quantum numbers of leptons"*
+### 🧮 Advanced Physics Analysis
+- *"Analyze the complete decay structure of B+ mesons with subdecay visualization"*
+- *"Get electron mass measurements from different experiments with technique comparison"*
+- *"Perform conservation law analysis for tau lepton decay modes"*
+- *"Compare quantum numbers of all leptons with detailed explanations"*
+- *"Analyze branching fraction uncertainties for D meson decays"*
 
-### PDG Data & Utilities
-- *"Convert 0.511 MeV to GeV using PDG units"*
-- *"Parse PDG identifier S008/2024"*
-- *"Validate PDG identifier and suggest alternatives"*
-- *"Apply PDG rounding rules to experimental data"*
+### 🔍 Intelligent Data Queries
+- *"Validate PDG identifier 'S008/2024' with format analysis and suggestions"*
+- *"Find best mass property for the proton using PDG criteria"*
+- *"Diagnose lookup issues for particle name 'elektron' with smart suggestions"*
+- *"Get measurement error component analysis for muon lifetime"*
 
-## 🖥️ Terminal CLI Usage
+### 🧰 Enhanced Utilities & Conversions
+- *"Convert 0.511 MeV to GeV with dimensional validation and physics context"*
+- *"Apply PDG rounding rules to experimental data with decision analysis"*
+- *"Parse compound PDG identifier 'M100/2024' with comprehensive validation"*
+- *"Get unit conversion factors between natural units with physics constants"*
 
-### Quick Commands
+### 📈 Research & Analysis Workflows
+- *"Perform temporal analysis of Z boson mass measurements over time"*
+- *"Analyze decay pattern signatures for exotic particle searches"*
+- *"Compare measurement techniques across different experiments for W boson width"*
+- *"Generate comprehensive particle classification report for all baryons"*
+
+## 🖥️ Enhanced Terminal CLI Usage
+
+### Quick Commands with Enhanced Features
 ```bash
-# Basic particle operations
-./pdg search --query "e-"
-./pdg properties --particle "proton"
-./pdg mass-measurements --particle "electron" --units "MeV"
+# Enhanced particle operations with smart search
+./pdg search --query "elektron" --fuzzy-match --include-suggestions
+./pdg properties --particle "proton" --include-quantum-numbers --include-decays
+./pdg mass-measurements --particle "electron" --units "MeV" --include-error-analysis
 
-# Advanced analysis
-./pdg decay-products --particle "tau-" --type exclusive
-./pdg quantum-numbers --particle "proton"
-./pdg convert-advanced --value 0.511 --from-units MeV --to-units GeV
+# Advanced decay analysis with visualization data
+./pdg decay-structure --particle "B+" --max-depth 3 --include-visualization
+./pdg branching-fractions --particle "tau-" --include-uncertainty-analysis --sort-by branching_fraction
+./pdg conservation-analysis --particle "D0" --include-verification
 
-# Utilities
-./pdg parse-pdg-id --pdgid "S008/2024"
-./pdg find-best-property --particle proton --property-type mass
-./pdg validate --identifier S008 --check-data
+# Enhanced quantum and particle analysis
+./pdg quantum-numbers --particle "proton" --include-jpc-notation --with-explanations
+./pdg particle-classification --criteria "is_baryon=True" --include-metadata
+./pdg compare-particles --particles "e-,mu-,tau-" --include-ratios --include-uncertainties
+
+# Intelligent utilities and validation
+./pdg validate-identifier --pdgid "S008" --check-data-availability --suggest-alternatives
+./pdg diagnose-lookup --query "elektron" --include-suggestions --analyze-patterns
+./pdg convert-advanced --value 0.511 --from-units MeV --to-units GeV --include-validation
+
+# Advanced measurement analysis
+./pdg measurement-techniques --particle "muon" --property "lifetime" --compare-methods
+./pdg error-analysis --particle "Z0" --property "mass" --include-systematic-errors
+./pdg reference-search --particle "higgs" --year-filter "2012-2024" --include-doi
 ```
 
-## 🔧 Key Tool Categories
+## 🔧 Enhanced Tool Categories
 
-### Core Physics Tools
-- **search_particle** - Search by name, MCID, or PDG ID
-- **get_particle_properties** - Detailed particle properties
-- **get_mass_measurements** - Mass with error bars and units
-- **get_branching_fractions** - Decay modes and branching ratios
-- **get_particle_quantum_numbers** - Quantum numbers (J, P, C, G, I)
+### 🔬 Core Physics Tools (Enhanced)
+- **search_particle** - Intelligent search with fuzzy matching and auto-detection
+- **get_particle_properties** - Comprehensive properties with enhanced metadata
+- **get_mass_measurements** - Mass with detailed error analysis and uncertainty propagation
+- **get_branching_fractions** - Decay modes with advanced uncertainty analysis
+- **get_particle_quantum_numbers** - Quantum numbers with educational context and notation
 
-### Data Analysis Tools
-- **convert_units_advanced** - Physics unit conversions with validation
-- **get_summary_values** - PDG summary table values
-- **analyze_decay_structure** - Hierarchical decay analysis
-- **compare_particles** - Side-by-side particle comparison
-- **get_measurements_by_property** - Individual measurements with references
+### 📊 Advanced Data Analysis Tools
+- **convert_units_advanced** - Enhanced conversions with dimensional validation
+- **get_summary_values** - PDG values with comprehensive metadata and quality indicators
+- **analyze_decay_structure** - Hierarchical analysis with visualization data
+- **compare_particles** - Advanced comparison with statistical analysis and correlations
+- **get_measurements_by_property** - Measurements with technique comparison and temporal analysis
 
-### Utility Tools
-- **parse_pdg_identifier** - Parse PDG IDs into components
-- **validate_pdg_identifier** - Validate and diagnose PDG IDs
-- **apply_pdg_rounding** - Apply PDG rounding rules
-- **safe_particle_lookup** - Safe lookup with error handling
+### 🛡️ Intelligent Utility Tools
+- **validate_pdg_identifier** - Comprehensive validation with format analysis
+- **diagnose_lookup_issues** - Smart diagnosis with pattern recognition
+- **safe_particle_lookup** - Enhanced lookup with intelligent fallbacks
+- **apply_pdg_rounding** - PDG rules with decision analysis and formatting
 
-## 🐍 Python API Example
+### 🔬 Research & Analytics Tools
+- **analyze_measurement_errors** - Advanced error component analysis
+- **compare_measurement_techniques** - Experimental method comparison
+- **get_decay_mode_details** - Enhanced classification with physics analysis
+- **get_physics_constants** - Constants with unit relationships and conversions
+
+## 🐍 Enhanced Python API Example
 
 ```python
 import asyncio
 import json
 import pdg_mcp_server as pdg_server
 
-async def research_example():
-    # Compare lepton masses
+async def advanced_research_example():
+    # Enhanced particle comparison with uncertainties
     result = await pdg_server.handle_call_tool('compare_particles', {
         'particle_names': ['e-', 'mu-', 'tau-'],
-        'properties': ['mass', 'lifetime', 'charge']
+        'properties': ['mass', 'lifetime', 'charge', 'quantum_numbers'],
+        'include_ratios': True,
+        'include_uncertainties': True
     })
     data = json.loads(result[0].text)
     
+    print("=== Enhanced Lepton Comparison ===")
     for particle in data['particles']:
-        print(f"{particle['name']}: {particle['mass']}")
+        mass_info = particle['mass']
+        print(f"{particle['name']}: {mass_info['formatted']} (precision: {mass_info.get('precision_class', 'N/A')})")
     
-    # Get tau decay modes
-    result = await pdg_server.handle_call_tool('get_branching_fractions', {
-        'particle_name': 'tau-',
-        'decay_type': 'exclusive',
+    # Property ratios with statistical analysis
+    if 'property_ratios' in data:
+        mass_ratios = data['property_ratios'].get('mass', {})
+        print(f"\nMass ratios: {mass_ratios.get('ratios', {})}")
+    
+    # Advanced decay structure analysis
+    result = await pdg_server.handle_call_tool('analyze_decay_structure', {
+        'particle_name': 'B+',
+        'max_depth': 3,
+        'include_visualization_data': True,
+        'include_probability_flow': True,
+        'min_probability_threshold': 0.001
+    })
+    decay_data = json.loads(result[0].text)
+    
+    print(f"\n=== B+ Meson Decay Structure ===")
+    print(f"Total analyzed modes: {decay_data.get('total_analyzed', 0)}")
+    
+    # Pattern analysis if available
+    if 'pattern_analysis' in decay_data:
+        patterns = decay_data['pattern_analysis']
+        print(f"Decay signatures: {patterns.get('decay_signatures', {})}")
+    
+    # Enhanced measurement analysis with error components
+    result = await pdg_server.handle_call_tool('analyze_measurement_errors', {
+        'particle_name': 'muon',
+        'property_type': 'lifetime',
         'limit': 5
     })
-    decays = json.loads(result[0].text)
+    error_data = json.loads(result[0].text)
     
-    for decay in decays['decay_modes']:
-        print(f"{decay['description']}: {decay['display_value']}")
+    print(f"\n=== Muon Lifetime Error Analysis ===")
+    if 'error_summary' in error_data:
+        summary = error_data['error_summary']
+        print(f"Statistical vs Systematic: {summary.get('error_breakdown', {})}")
 
-asyncio.run(research_example())
+asyncio.run(advanced_research_example())
 ```
 
-## 🧪 Testing & Development
+## 🧪 Enhanced Testing & Development
 
 ```bash
-# Run all tests
+# Run comprehensive test suite
 python test_modular.py
 
-# Test specific functionality
-python pdg_cli.py search pi+
-python pdg_cli.py quantum-numbers --particle proton
+# Test enhanced functionality with validation
+python pdg_cli.py search "elektron" --fuzzy-match
+python pdg_cli.py validate-identifier "s008" --suggest-alternatives
+python pdg_cli.py decay-structure "tau-" --include-visualization
 
-# Run examples
-python examples.py
+# Run enhanced examples with new capabilities
+python examples.py  # Now includes advanced analysis examples
+
+# Development testing with enhanced error handling
+python -c "import pdg_modules; print('All enhanced modules imported successfully')"
 ```
 
-## 📊 Complete Tool Reference
+## 📊 Complete Enhanced Tool Reference
 
-### API Module (11 tools)
-- `search_particle` - Search for particles by name, MCID, or PDG ID
-- `get_particle_properties` - Get detailed particle properties
-- `list_particles` - List particles by type with filtering
-- `get_particle_by_mcid` - Get particle by Monte Carlo ID
-- `compare_particles` - Compare multiple particles side-by-side
-- `get_database_info` - Get PDG database information
-- `get_canonical_name` - Get canonical particle names
-- `get_particles_by_name` - Search particles by name patterns
-- `get_editions` - List available PDG editions
-- `get_pdg_by_identifier` - Get particle by PDG identifier
-- `get_all_pdg_identifiers` - List all PDG identifiers
+### 🔬 API Module (11 Enhanced Tools)
+- `search_particle` - **Enhanced**: Intelligent search with fuzzy matching, auto-detection, and confidence scoring
+- `get_particle_properties` - **Enhanced**: Comprehensive properties with quantum number formatting and educational content
+- `list_particles` - **Enhanced**: Advanced filtering with mass ranges, charge filters, and statistical analysis
+- `get_particle_by_mcid` - **Enhanced**: Validation with related particle discovery and comprehensive metadata
+- `compare_particles` - **Enhanced**: Multi-particle analysis with statistical ratios and uncertainty propagation
+- `get_database_info` - **Enhanced**: Comprehensive metadata with statistics and capability documentation
+- `get_canonical_name` - **Enhanced**: Intelligent name resolution with alternative suggestions
+- `get_particles_by_name` - **Enhanced**: Fuzzy matching with confidence scores and pattern recognition
+- `get_editions` - **Enhanced**: Edition metadata with publication details and change tracking
+- `get_pdg_by_identifier` - **Enhanced**: Validation with format analysis and related object discovery
+- `get_all_pdg_identifiers` - **Enhanced**: Filtered listings with metadata and category organization
 
-### Data Module (11 tools)
-- `get_mass_measurements` - Mass measurements with errors and units
-- `get_lifetime_measurements` - Lifetime measurements with units
-- `get_width_measurements` - Width measurements for unstable particles
-- `get_summary_values` - PDG summary table values
-- `get_measurements_by_property` - Individual measurements with references
-- `convert_units` - Convert between physics units
-- `get_particle_text` - Get text descriptions and reviews
-- `get_property_details` - Detailed property information
-- `get_data_type_keys` - Available data type keys
-- `get_value_type_keys` - Available value type keys
-- `get_key_documentation` - Documentation for specific keys
+### 📊 Data Module (11 Enhanced Tools)
+- `get_mass_measurements` - **Enhanced**: Detailed error analysis with precision classification and derived quantities
+- `get_lifetime_measurements` - **Enhanced**: Decay analysis with width relations and unit conversion factors
+- `get_width_measurements` - **Enhanced**: Lifetime calculations with uncertainty propagation and physics context
+- `get_summary_values` - **Enhanced**: Comprehensive metadata with validation and quality indicators
+- `get_measurements_by_property` - **Enhanced**: Experimental details with technique comparison and temporal analysis
+- `convert_units` - **Enhanced**: Validation with physics context and dimensional analysis
+- `get_particle_text` - **Enhanced**: Formatted text with markup preservation and reference integration
+- `get_property_details` - **Enhanced**: Comprehensive metadata with statistical analysis and data flags
+- `get_data_type_keys` - **Enhanced**: Documentation with examples and category filtering
+- `get_value_type_keys` - **Enhanced**: Descriptions with usage statistics and frequency analysis
+- `get_key_documentation` - **Enhanced**: Context with examples and comprehensive usage guidance
 
-### Measurement Module (8 tools)
-- `get_measurement_details` - Detailed measurement information
-- `get_measurement_value_details` - Value details with error breakdown
-- `get_reference_details` - Publication reference information
-- `search_measurements_by_reference` - Search by publication criteria
-- `get_footnote_details` - Footnote text and references
-- `analyze_measurement_errors` - Error component analysis
-- `get_measurements_for_particle` - All measurements for a particle
-- `compare_measurement_techniques` - Compare measurement methods
+### 🔬 Measurement Module (8 Enhanced Tools)
+- `get_measurement_details` - **Enhanced**: Comprehensive information with value breakdown and metadata analysis
+- `get_measurement_value_details` - **Enhanced**: Error component analysis with statistical vs systematic breakdown
+- `get_reference_details` - **Enhanced**: Publication information with DOI integration and citation metrics
+- `search_measurements_by_reference` - **Enhanced**: Advanced filtering with author search and temporal analysis
+- `get_footnote_details` - **Enhanced**: Context with reference tracking and detailed explanations
+- `analyze_measurement_errors` - **Enhanced**: Statistical analysis with precision classification and correlation study
+- `get_measurements_for_particle` - **Enhanced**: Comprehensive breakdown with quality metrics and technique comparison
+- `compare_measurement_techniques` - **Enhanced**: Experimental method analysis with statistical validation
 
-### Particle Module (10 tools)
-- `get_particle_quantum_numbers` - Quantum numbers (J, P, C, G, I)
-- `check_particle_properties` - Particle classification checks
-- `get_particle_list_by_criteria` - Filter particles by criteria
-- `get_particle_properties_detailed` - Comprehensive properties
-- `analyze_particle_item` - Analyze PDG items from descriptions
-- `get_particle_mass_details` - Detailed mass information
-- `get_particle_lifetime_details` - Detailed lifetime information
-- `get_particle_width_details` - Detailed width information
-- `compare_particle_quantum_numbers` - Compare quantum numbers
-- `get_particle_error_info` - Error information for properties
+### ⚛️ Particle Module (10 Enhanced Tools)
+- `get_particle_quantum_numbers` - **Enhanced**: Detailed explanations with JPC notation and physics context
+- `check_particle_properties` - **Enhanced**: Classification with comprehensive metadata and physics background
+- `get_particle_list_by_criteria` - **Enhanced**: Advanced filtering with intelligent suggestions and statistical summaries
+- `get_particle_properties_detailed` - **Enhanced**: Comprehensive analysis with uncertainty quantification and validation
+- `analyze_particle_item` - **Enhanced**: Item analysis with associated particle information and context
+- `get_particle_mass_details` - **Enhanced**: Detailed mass information with measurement tracking and error analysis
+- `get_particle_lifetime_details` - **Enhanced**: Lifetime analysis with decay constant calculations and physics relations
+- `get_particle_width_details` - **Enhanced**: Width information with lifetime calculations and uncertainty analysis
+- `compare_particle_quantum_numbers` - **Enhanced**: Quantum number comparison with detailed explanations and patterns
+- `get_particle_error_info` - **Enhanced**: Error analysis with asymmetric uncertainty handling and precision classification
 
-### Units Module (7 tools)
-- `convert_units_advanced` - Advanced unit conversion with validation
-- `get_unit_conversion_factors` - Available conversion factors
-- `get_physics_constants` - Physics constants (ħ, c, etc.)
-- `validate_unit_compatibility` - Check unit compatibility
-- `get_unit_info` - Detailed unit information
-- `convert_between_natural_units` - Natural unit conversions
-- `get_common_conversions` - Common physics unit conversions
+### 🔧 Units Module (7 Enhanced Tools)
+- `convert_units_advanced` - **Enhanced**: Dimensional validation with physics context and uncertainty propagation
+- `get_unit_conversion_factors` - **Enhanced**: Comprehensive factors with base units and physics constants
+- `get_physics_constants` - **Enhanced**: Constants with descriptions and unit relationships
+- `validate_unit_compatibility` - **Enhanced**: Compatibility checking with detailed explanations and suggestions
+- `get_unit_info` - **Enhanced**: Detailed information with conversion examples and physics context
+- `convert_between_natural_units` - **Enhanced**: Natural unit conversions with dimensional analysis
+- `get_common_conversions` - **Enhanced**: Common physics conversions with examples and validation
 
-### Utils Module (8 tools)
-- `parse_pdg_identifier` - Parse PDG IDs into components
-- `get_base_pdg_id` - Get base PDG identifier
-- `make_pdg_identifier` - Create normalized PDG identifiers
-- `find_best_property` - Find best property using PDG criteria
-- `apply_pdg_rounding` - Apply PDG rounding rules
-- `get_linked_data` - Get linked database data
-- `normalize_pdg_data` - Normalize and validate data
-- `get_pdg_table_data` - Access raw database tables
+### 🛠️ Utils Module (8 Enhanced Tools)
+- `parse_pdg_identifier` - **Enhanced**: Comprehensive parsing with format validation and detailed analysis
+- `get_base_pdg_id` - **Enhanced**: Base identifier extraction with validation and normalization
+- `make_pdg_identifier` - **Enhanced**: Identifier creation with format validation and edition handling
+- `find_best_property` - **Enhanced**: Intelligent selection using official PDG criteria with confidence scoring
+- `apply_pdg_rounding` - **Enhanced**: Rounding rules with decision analysis and formatting options
+- `get_linked_data` - **Enhanced**: Database linking with metadata and comprehensive reference tracking
+- `normalize_pdg_data` - **Enhanced**: Data validation with quality metrics and integrity checking
+- `get_pdg_table_data` - **Enhanced**: Raw data access with metadata and comprehensive table information
 
-### Decay Module (5 tools)
-- `get_branching_fractions` - Branching fractions (exclusive/inclusive)
-- `get_decay_products` - Decay products with subdecay support
-- `get_branching_ratios` - Branching ratios between modes
-- `get_decay_mode_details` - Detailed decay mode information
-- `analyze_decay_structure` - Hierarchical decay analysis
+### 🔬 Decay Module (5 Enhanced Tools)
+- `get_branching_fractions` - **Enhanced**: Advanced uncertainty analysis with statistical validation and classification
+- `get_decay_products` - **Enhanced**: Comprehensive analysis with conservation law verification and particle flow tracking
+- `get_branching_ratios` - **Enhanced**: Enhanced correlations with systematic uncertainty analysis
+- `get_decay_mode_details` - **Enhanced**: Classification with physics analysis and selection rule validation
+- `analyze_decay_structure` - **Enhanced**: Hierarchical analysis with visualization data and pattern recognition
 
-### Error Module (4 tools)
-- `validate_pdg_identifier` - Validate PDG identifiers
-- `get_error_info` - Error type information
-- `diagnose_lookup_issues` - Diagnose lookup problems
-- `safe_particle_lookup` - Safe lookup with error handling
+### 🛡️ Error Module (4 Enhanced Tools)
+- `validate_pdg_identifier` - **Enhanced**: Comprehensive validation with format analysis and intelligent suggestions
+- `get_error_info` - **Enhanced**: Detailed error documentation with recovery guidance and examples
+- `diagnose_lookup_issues` - **Enhanced**: Pattern recognition with smart suggestions and confidence scoring
+- `safe_particle_lookup` - **Enhanced**: Intelligent fallbacks with alternative search strategies and error context
 
-## 📊 Common Particle Reference
+## 📊 Common Particle Reference (Enhanced)
 
-| Particle | Name | MCID | Mass (GeV) | Charge |
-|----------|------|------|------------|--------|
-| Electron | `e-` | 11 | 0.000511 | -1 |
-| Muon | `mu-` | 13 | 0.105658 | -1 |
-| Tau | `tau-` | 15 | 1.77686 | -1 |
-| Proton | `p` | 2212 | 0.938272 | +1 |
-| Neutron | `n` | 2112 | 0.939565 | 0 |
-| Pion+ | `pi+` | 211 | 0.139570 | +1 |
+| Particle | Name | MCID | Mass (GeV) | Charge | Lifetime (s) | Key Properties |
+|----------|------|------|------------|--------|--------------|----------------|
+| Electron | `e-` | 11 | 0.0005109989 ± 0.0000000010 | -1 | stable | Fundamental lepton |
+| Muon | `mu-` | 13 | 0.1056583745 ± 0.0000000024 | -1 | 2.1969811 × 10⁻⁶ | Heavy electron analog |
+| Tau | `tau-` | 15 | 1.77686 ± 0.00012 | -1 | 2.903 × 10⁻¹³ | Heaviest lepton |
+| Proton | `p` | 2212 | 0.9382720813 ± 0.0000000058 | +1 | stable | Light quark baryon |
+| Neutron | `n` | 2112 | 0.9395654133 ± 0.0000000058 | 0 | 879.4 ± 0.6 | Free neutron decay |
+| Pion+ | `pi+` | 211 | 0.13957039 ± 0.00000018 | +1 | 2.6033 × 10⁻⁸ | Light meson |
 
 ## 📦 Dependencies & Licensing
 

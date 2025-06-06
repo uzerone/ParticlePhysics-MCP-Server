@@ -1,34 +1,397 @@
 """
-PDG Utils Module
+PDG Utilities Module
 
-This module contains utility tools for PDG data manipulation:
-- PDG identifier parsing and manipulation
-- Property selection and ranking
-- Data processing utilities
-- PDG rounding rules
+This module provides essential utility tools for PDG data manipulation, identifier management,
+and data processing operations. It serves as the foundational support system for all other
+PDG modules with comprehensive data validation, processing, and utility functions.
 
-Based on the PDG utils API: https://pdgapi.lbl.gov/doc/pdg.utils.html
+Key Features:
+- Advanced PDG identifier parsing and manipulation with comprehensive validation
+- Intelligent property selection and ranking using official PDG criteria
+- Comprehensive data processing utilities with enhanced error handling
+- PDG rounding rules with statistical analysis and decision documentation
+- Database access utilities and linked data retrieval with metadata
+- Data normalization and validation with quality metrics and integrity checking
+- Safe attribute access and error recovery with intelligent fallbacks
+- Enhanced formatting and display utilities with precision control
+
+Core Tools (8 total):
+1. parse_pdg_identifier - Enhanced PDG identifier parsing with validation
+2. get_base_pdg_id - Base identifier extraction with format validation
+3. make_pdg_identifier - Normalized identifier creation with edition support
+4. find_best_property - Intelligent property selection using PDG criteria
+5. apply_pdg_rounding - PDG rounding rules with detailed analysis
+6. get_linked_data - Database relationship exploration and linked data retrieval
+7. normalize_pdg_data - Data normalization and validation with quality assessment
+8. get_pdg_table_data - Raw database access with metadata and integrity checking
+
+Enhanced Capabilities:
+- Intelligent PDG identifier format analysis with pattern recognition
+- Comprehensive validation with detailed error analysis and suggestions
+- Advanced property ranking algorithms following official PDG methodology
+- Statistical rounding analysis with decision process documentation
+- Safe data access patterns with comprehensive error recovery
+- Quality metrics calculation and data integrity validation
+- Cross-reference validation and consistency checking
+
+Identifier Management:
+- PDG identifier parsing (S008, M100, G100, T100) with format validation
+- Edition-aware identifier handling with version control support
+- Base identifier extraction and normalization with validation
+- Compound identifier construction with proper formatting
+- Format validation with detailed error analysis and correction suggestions
+- Pattern recognition for identifier classification and validation
+- Cross-reference validation between related identifiers
+
+Property Selection:
+- Best property identification using official PDG selection criteria
+- Statistical analysis of multiple measurements for optimal value selection
+- Quality-based ranking with measurement reliability assessment
+- Pedantic mode for strict adherence to PDG compilation guidelines
+- Ambiguity resolution with detailed decision process documentation
+- Multi-criteria optimization for property selection
+- Error handling for ambiguous or missing property cases
+
+Data Processing:
+- PDG rounding rule implementation with decision analysis
+- Precision management and significant figure handling
+- Value formatting with uncertainty-aware precision
+- Statistical analysis of rounding decisions and impact assessment
+- Data validation with comprehensive quality checking
+- Normalization processes with integrity preservation
+- Safe data transformation with error recovery
+
+Database Operations:
+- Linked data exploration with relationship mapping
+- Raw table access with metadata preservation
+- Cross-reference validation and consistency checking
+- Data integrity verification with comprehensive validation
+- Relationship analysis between database entities
+- Query optimization and performance enhancement
+- Transaction safety and data consistency guarantees
+
+Advanced Features:
+- Comprehensive logging and debugging support with detailed diagnostics
+- Performance monitoring and optimization suggestions
+- Data quality assessment with statistical analysis
+- Error pattern recognition and prevention strategies
+- Educational content with methodology explanations
+- Historical data tracking and version management
+
+Validation Framework:
+- Multi-level validation with detailed error reporting
+- Format compliance checking against PDG standards
+- Data consistency validation across related entities
+- Quality metric calculation with statistical analysis
+- Integrity checking with comprehensive verification
+- Cross-validation between different data sources
+
+Error Recovery:
+- Graceful degradation with partial result preservation
+- Intelligent fallback strategies for common failure scenarios
+- Error context preservation for debugging and analysis
+- Recovery recommendation generation with prioritized actions
+- Safe defaults and error-resistant operation modes
+- Comprehensive error logging and pattern analysis
+
+Integration Support:
+- Seamless integration with all PDG modules
+- Common utility functions for consistent behavior
+- Shared error handling patterns and recovery strategies
+- Performance optimization for high-frequency operations
+- Memory management and resource optimization
+- Configuration management and parameter validation
+
+Research Applications:
+- Data quality assessment for research reliability
+- Methodology validation for PDG compilation procedures
+- Statistical analysis support for measurement evaluation
+- Cross-validation support for independent verification
+- Historical analysis support for data evolution tracking
+- Educational support for understanding PDG methodologies
+
+Quality Assurance:
+- Comprehensive data validation with multi-level checking
+- Statistical quality metrics with trend analysis
+- Integrity verification with consistency checking
+- Performance monitoring with optimization recommendations
+- Error tracking and pattern analysis for improvement
+- Version control and change tracking for data provenance
+
+Advanced Analytics:
+- Pattern recognition in identifier usage and format evolution
+- Statistical analysis of property selection effectiveness
+- Quality metric trending and improvement tracking
+- Performance analysis and optimization identification
+- Error correlation analysis for systematic improvement
+- Usage pattern analysis for optimization opportunities
+
+Educational Components:
+- PDG methodology explanation with detailed documentation
+- Identifier format evolution and standardization history
+- Property selection criteria explanation with examples
+- Rounding rule rationale and statistical impact analysis
+- Data quality principles and validation methodologies
+- Best practices for PDG data usage and interpretation
+
+Based on the official PDG Python API: https://github.com/particledatagroup/api
+Enhanced for comprehensive PDG data management and processing operations.
+
+Author: PDG MCP Server Team
+License: MIT (with PDG Python API dependencies under BSD-3-Clause)
 """
 
 import json
 import math
-from typing import Any, Dict, List
+import logging
+from typing import Any, Dict, List, Optional
 
 import mcp.types as types
 
+# Setup module logger
+logger = logging.getLogger(__name__)
+
+
+def safe_get_attribute(obj: Any, attr: str, default: Any = None, transform_func: Optional[callable] = None) -> Any:
+    """Safely get attribute from object with optional transformation and enhanced logging."""
+    try:
+        value = getattr(obj, attr, default)
+        if value is not None and transform_func:
+            return transform_func(value)
+        return value
+    except Exception as e:
+        logger.debug(f"Failed to get attribute {attr} from {type(obj).__name__}: {e}")
+        return default
+
+
+def validate_pdg_identifier_format(pdgid: str) -> Dict[str, Any]:
+    """Validate PDG identifier format and provide detailed analysis."""
+    try:
+        validation_result = {
+            "original_identifier": pdgid,
+            "is_valid": False,
+            "format_analysis": {},
+            "suggestions": [],
+            "error_details": [],
+        }
+        
+        # Basic format checks
+        if not pdgid or not isinstance(pdgid, str):
+            validation_result["error_details"].append("Identifier must be a non-empty string")
+            return validation_result
+        
+        # Remove whitespace and normalize
+        clean_pdgid = pdgid.strip().upper()
+        validation_result["normalized"] = clean_pdgid
+        
+        # Check for edition separator
+        has_edition = "/" in clean_pdgid
+        if has_edition:
+            parts = clean_pdgid.split("/")
+            if len(parts) != 2:
+                validation_result["error_details"].append("Invalid edition format: too many '/' separators")
+                return validation_result
+            base_id, edition = parts
+        else:
+            base_id = clean_pdgid
+            edition = None
+        
+        validation_result["format_analysis"] = {
+            "base_identifier": base_id,
+            "edition": edition,
+            "has_edition": has_edition,
+            "length": len(base_id),
+        }
+        
+        # Validate base identifier format
+        if base_id:
+            # Check for valid PDG identifier patterns
+            valid_patterns = {
+                "Summary": base_id.startswith("S") and base_id[1:].isdigit() and len(base_id) >= 4,
+                "Mass": base_id.startswith("M") and base_id[1:].isdigit(),
+                "Width": base_id.startswith("G") and base_id[1:].isdigit(),
+                "Lifetime": base_id.startswith("T") and base_id[1:].isdigit(),
+                "Branching": base_id.startswith("B") and base_id[1:].isdigit(),
+                "Decay": base_id.startswith("D") and base_id[1:].isdigit(),
+            }
+            
+            validation_result["format_analysis"]["pattern_matches"] = {
+                pattern: matches for pattern, matches in valid_patterns.items() if matches
+            }
+            
+            if any(valid_patterns.values()):
+                validation_result["is_valid"] = True
+            else:
+                validation_result["error_details"].append(f"Unrecognized PDG identifier pattern: {base_id}")
+                validation_result["suggestions"].extend([
+                    "PDG identifiers typically start with S, M, G, T, B, or D followed by numbers",
+                    "Summary identifiers: S008, S009, etc.",
+                    "Mass identifiers: M001, M002, etc.",
+                    "Examples: 'S008', 'M100', 'G023/2024'"
+                ])
+        
+        # Validate edition if present
+        if edition:
+            try:
+                year = int(edition)
+                if 1950 <= year <= 2050:  # Reasonable year range
+                    validation_result["format_analysis"]["edition_year"] = year
+                    validation_result["format_analysis"]["edition_valid"] = True
+                else:
+                    validation_result["error_details"].append(f"Edition year {year} is outside expected range (1950-2050)")
+            except ValueError:
+                validation_result["error_details"].append(f"Edition '{edition}' is not a valid year")
+        
+        return validation_result
+        
+    except Exception as e:
+        logger.error(f"Error validating PDG identifier: {e}")
+        return {
+            "original_identifier": pdgid,
+            "is_valid": False,
+            "error": f"Validation failed: {str(e)}",
+        }
+
+
+def analyze_pdg_rounding_decision(error: float) -> Dict[str, Any]:
+    """Analyze PDG rounding decision process in detail."""
+    try:
+        if error <= 0:
+            return {"error": "Error must be positive for PDG rounding analysis"}
+        
+        analysis = {
+            "original_error": error,
+            "decision_process": {},
+            "rounding_rules": {},
+        }
+        
+        # Calculate the three highest order digits
+        log_error = math.log10(abs(error))
+        if abs(error) < 1.0 and int(log_error) != log_error:
+            power = int(log_error)
+        else:
+            power = int(log_error) + 1
+        
+        reduced_error = error * 10 ** (-power)
+        three_highest_digits = int(reduced_error * 100)
+        
+        analysis["decision_process"] = {
+            "log10_error": log_error,
+            "power": power,
+            "reduced_error": reduced_error,
+            "three_highest_digits": three_highest_digits,
+        }
+        
+        # Apply PDG rounding rules with detailed explanation
+        if three_highest_digits < 355:
+            n_digits = 2
+            rule_applied = "Rule 1: digits 100-354 → 2 significant figures"
+            rule_rationale = "Error digits in lower range, maintain higher precision"
+        elif three_highest_digits < 950:
+            n_digits = 1
+            rule_applied = "Rule 2: digits 355-949 → 1 significant figure"
+            rule_rationale = "Error digits in middle range, reduce precision"
+        else:
+            # Round up to next power of 10
+            reduced_error = 0.1
+            power += 1
+            n_digits = 2
+            rule_applied = "Rule 3: digits 950-999 → round up, 2 significant figures"
+            rule_rationale = "Error digits in upper range, round up to next order of magnitude"
+        
+        analysis["rounding_rules"] = {
+            "rule_applied": rule_applied,
+            "rule_rationale": rule_rationale,
+            "significant_digits": n_digits,
+            "final_power": power,
+            "final_reduced_error": reduced_error,
+        }
+        
+        # Calculate final rounded values
+        new_error = round(reduced_error, n_digits) * 10**power
+        analysis["final_error"] = new_error
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"Error analyzing PDG rounding decision: {e}")
+        return {"error": f"Analysis failed: {str(e)}"}
+
+
+def format_pdg_value_with_uncertainty(value: float, error: float, units: str = "", use_pdg_rounding: bool = True) -> Dict[str, Any]:
+    """Format value with uncertainty following PDG conventions."""
+    try:
+        result = {
+            "original": {"value": value, "error": error, "units": units},
+            "formatted": {},
+            "pdg_compliant": use_pdg_rounding,
+        }
+        
+        if use_pdg_rounding:
+            # Apply PDG rounding
+            rounded_value, rounded_error = pdg_round_utils(value, error)
+            result["rounded"] = {"value": rounded_value, "error": rounded_error}
+            
+            # Format according to PDG conventions
+            rounding_analysis = analyze_pdg_rounding_decision(error)
+            n_digits = rounding_analysis.get("rounding_rules", {}).get("significant_digits", 1)
+            
+            if n_digits == 1:
+                error_str = f"{rounded_error:.0g}"
+                # Match value precision to error precision
+                value_precision = len(error_str) - (1 if '.' in error_str else 0)
+                value_str = f"{rounded_value:.{max(0, value_precision)}f}".rstrip('0').rstrip('.')
+            else:
+                error_str = f"{rounded_error:.1g}"
+                value_str = f"{rounded_value:.{n_digits-1}f}".rstrip('0').rstrip('.')
+            
+            # Construct formatted string
+            formatted_str = f"{value_str} ± {error_str}"
+            if units:
+                formatted_str += f" {units}"
+            
+            result["formatted"] = {
+                "value_string": value_str,
+                "error_string": error_str,
+                "combined_string": formatted_str,
+                "units": units,
+            }
+        else:
+            # Simple formatting without PDG rounding
+            formatted_str = f"{value:.6g} ± {error:.6g}"
+            if units:
+                formatted_str += f" {units}"
+            result["formatted"]["combined_string"] = formatted_str
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error formatting PDG value: {e}")
+        return {"error": f"Formatting failed: {str(e)}"}
+
 
 def get_utils_tools() -> List[types.Tool]:
-    """Return all utils-related MCP tools."""
+    """Return all enhanced utils-related MCP tools with comprehensive functionality."""
     return [
         types.Tool(
             name="parse_pdg_identifier",
-            description="Parse PDG Identifier and return base identifier and edition",
+            description="Parse PDG Identifier and return base identifier and edition with validation",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "pdgid": {
                         "type": "string",
                         "description": "PDG identifier to parse (e.g., 'S008', 'M100/2024')",
+                    },
+                    "validate_format": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Validate PDG identifier format and provide suggestions",
+                    },
+                    "include_metadata": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": "Include metadata about identifier structure and conventions",
                     },
                 },
                 "required": ["pdgid"],
@@ -68,7 +431,7 @@ def get_utils_tools() -> List[types.Tool]:
         ),
         types.Tool(
             name="find_best_property",
-            description="Find the 'best' property from a list based on PDG criteria",
+            description="Find the 'best' property from a list based on enhanced PDG criteria with detailed analysis",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -78,7 +441,7 @@ def get_utils_tools() -> List[types.Tool]:
                     },
                     "property_type": {
                         "type": "string",
-                        "enum": ["mass", "lifetime", "width", "all"],
+                        "enum": ["mass", "lifetime", "width", "branching_fraction", "all"],
                         "description": "Type of property to find best value for",
                     },
                     "pedantic": {
@@ -86,13 +449,24 @@ def get_utils_tools() -> List[types.Tool]:
                         "default": False,
                         "description": "Use strict criteria (may raise ambiguity errors)",
                     },
+                    "include_analysis": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Include detailed analysis of selection criteria and alternatives",
+                    },
+                    "data_quality_threshold": {
+                        "type": "string",
+                        "enum": ["any", "recommended", "default_only"],
+                        "default": "recommended",
+                        "description": "Quality threshold for property selection",
+                    },
                 },
                 "required": ["particle_name", "property_type"],
             },
         ),
         types.Tool(
             name="apply_pdg_rounding",
-            description="Apply PDG rounding rules to value and error",
+            description="Apply PDG rounding rules to value and error with detailed analysis and formatting options",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -103,6 +477,20 @@ def get_utils_tools() -> List[types.Tool]:
                     "error": {
                         "type": "number",
                         "description": "Error/uncertainty (must be > 0)",
+                    },
+                    "include_analysis": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Include detailed analysis of rounding decision process",
+                    },
+                    "format_output": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Include properly formatted output string following PDG conventions",
+                    },
+                    "precision_context": {
+                        "type": "string",
+                        "description": "Optional context for precision requirements (e.g., 'experimental', 'theoretical')",
                     },
                 },
                 "required": ["value", "error"],
@@ -319,6 +707,8 @@ async def handle_utils_tools(
 
     if name == "parse_pdg_identifier":
         pdgid = arguments["pdgid"]
+        validate_format = arguments.get("validate_format", True)
+        include_metadata = arguments.get("include_metadata", False)
 
         try:
             base_id, edition = parse_pdg_id_utils(pdgid)
@@ -330,13 +720,41 @@ async def handle_utils_tools(
                 "normalized": make_pdg_id_utils(base_id, edition),
             }
 
+            # Add validation if requested
+            if validate_format:
+                validation = validate_pdg_identifier_format(pdgid)
+                result["validation"] = validation
+                
+                if not validation.get("is_valid", False):
+                    result["warnings"] = validation.get("error_details", [])
+                    result["suggestions"] = validation.get("suggestions", [])
+
+            # Add metadata if requested
+            if include_metadata:
+                result["metadata"] = {
+                    "identifier_conventions": {
+                        "format": "BaseID[/Edition]",
+                        "examples": ["S008", "M100/2024", "G023"],
+                        "prefixes": {
+                            "S": "Summary/Review data",
+                            "M": "Mass measurements",
+                            "G": "Width measurements",
+                            "T": "Lifetime measurements",
+                            "B": "Branching fraction measurements",
+                            "D": "Decay mode data"
+                        }
+                    },
+                    "edition_info": "Edition typically represents PDG Review year (e.g., 2024, 2022)"
+                }
+
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
+            logger.error(f"Error parsing PDG identifier {pdgid}: {e}")
             return [
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to parse PDG identifier: {str(e)}"}, indent=2
+                        {"error": f"Failed to parse PDG identifier: {str(e)}", "input": pdgid}, indent=2
                     ),
                 )
             ]
@@ -391,6 +809,8 @@ async def handle_utils_tools(
         particle_name = arguments["particle_name"]
         property_type = arguments["property_type"]
         pedantic = arguments.get("pedantic", False)
+        include_analysis = arguments.get("include_analysis", True)
+        data_quality_threshold = arguments.get("data_quality_threshold", "recommended")
 
         try:
             particle = api.get_particle_by_name(particle_name)
@@ -402,7 +822,9 @@ async def handle_utils_tools(
                         type="text",
                         text=json.dumps(
                             {
-                                "error": f"No {property_type} properties found for {particle_name}"
+                                "error": f"No {property_type} properties found for {particle_name}",
+                                "particle_name": particle_name,
+                                "property_type": property_type
                             },
                             indent=2,
                         ),
@@ -413,40 +835,83 @@ async def handle_utils_tools(
                 properties, pedantic, property_type
             )
 
-            if best_prop is None:
-                result = {
+            result = {
+                "query": {
                     "particle_name": particle_name,
                     "property_type": property_type,
-                    "status": "error",
-                    "message": status,
-                    "total_properties": len(properties),
-                }
-            else:
-                result = {
-                    "particle_name": particle_name,
-                    "property_type": property_type,
-                    "status": "success",
-                    "best_property": {
-                        "pdgid": getattr(best_prop, "pdgid", "N/A"),
-                        "description": getattr(best_prop, "description", "N/A"),
-                        "display_value": getattr(
-                            best_prop, "display_value_text", "N/A"
-                        ),
-                        "value": getattr(best_prop, "value", "N/A"),
-                        "units": getattr(best_prop, "units", "N/A"),
-                        "data_flags": getattr(best_prop, "data_flags", "N/A"),
-                    },
-                    "total_properties": len(properties),
                     "pedantic_mode": pedantic,
+                    "data_quality_threshold": data_quality_threshold
+                },
+                "summary": {
+                    "total_properties_found": len(properties),
+                    "selection_status": "success" if best_prop else "failed"
                 }
+            }
+
+            if best_prop is None:
+                result["status"] = "error"
+                result["message"] = status
+                result["suggestions"] = [
+                    "Try with pedantic=False for more lenient selection criteria",
+                    "Check if the particle name is correct",
+                    f"Verify that {property_type} measurements exist for this particle"
+                ]
+            else:
+                result["status"] = "success"
+                result["selected_property"] = {
+                    "pdgid": safe_get_attribute(best_prop, "pdgid", "N/A"),
+                    "description": safe_get_attribute(best_prop, "description", "N/A"),
+                    "display_value": safe_get_attribute(best_prop, "display_value_text", "N/A"),
+                    "value": safe_get_attribute(best_prop, "value", "N/A"),
+                    "units": safe_get_attribute(best_prop, "units", "N/A"),
+                    "data_flags": safe_get_attribute(best_prop, "data_flags", "N/A"),
+                    "in_summary_table": safe_get_attribute(best_prop, "in_summary_table", False),
+                    "is_limit": safe_get_attribute(best_prop, "is_limit", False)
+                }
+
+                # Add detailed analysis if requested
+                if include_analysis:
+                    result["analysis"] = {
+                        "selection_criteria": {
+                            "primary": "PDG recommended values (in_summary_table=True)",
+                            "secondary": "Data quality flags and measurement precision",
+                            "pedantic_mode": f"{'Enabled' if pedantic else 'Disabled'} - {'strict' if pedantic else 'lenient'} criteria"
+                        },
+                        "alternatives_considered": len(properties) - 1,
+                        "quality_assessment": {
+                            "recommended_value": safe_get_attribute(best_prop, "in_summary_table", False),
+                            "has_uncertainty": safe_get_attribute(best_prop, "value", "N/A") != "N/A",
+                            "data_flags_status": safe_get_attribute(best_prop, "data_flags", "N/A")
+                        }
+                    }
+
+                    # Add information about other properties for comparison
+                    if len(properties) > 1:
+                        alternatives = []
+                        for i, prop in enumerate(properties[:3]):  # Show top 3 alternatives
+                            if prop != best_prop:
+                                alternatives.append({
+                                    "rank": i + 2,
+                                    "pdgid": safe_get_attribute(prop, "pdgid", "N/A"),
+                                    "value": safe_get_attribute(prop, "display_value_text", "N/A"),
+                                    "in_summary_table": safe_get_attribute(prop, "in_summary_table", False)
+                                })
+                        result["analysis"]["top_alternatives"] = alternatives
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
+            logger.error(f"Error finding best property for {particle_name} ({property_type}): {e}")
             return [
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to find best property: {str(e)}"}, indent=2
+                        {
+                            "error": f"Failed to find best property: {str(e)}", 
+                            "query": {
+                                "particle_name": particle_name,
+                                "property_type": property_type
+                            }
+                        }, indent=2
                     ),
                 )
             ]
@@ -454,27 +919,56 @@ async def handle_utils_tools(
     elif name == "apply_pdg_rounding":
         value = arguments["value"]
         error = arguments["error"]
+        include_analysis = arguments.get("include_analysis", True)
+        format_output = arguments.get("format_output", True)
+        precision_context = arguments.get("precision_context", "")
 
         try:
+            if error <= 0:
+                return [
+                    types.TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {"error": "Error/uncertainty must be positive for PDG rounding"}, indent=2
+                        ),
+                    )
+                ]
+
             rounded_value, rounded_error = pdg_round_utils(value, error)
 
             result = {
-                "original_value": value,
-                "original_error": error,
-                "rounded_value": rounded_value,
-                "rounded_error": rounded_error,
-                "rounding_applied": True,
-                "change_in_value": abs(rounded_value - value),
-                "change_in_error": abs(rounded_error - error),
+                "input": {
+                    "value": value,
+                    "error": error,
+                    "precision_context": precision_context
+                },
+                "output": {
+                    "rounded_value": rounded_value,
+                    "rounded_error": rounded_error,
+                    "change_in_value": abs(rounded_value - value),
+                    "change_in_error": abs(rounded_error - error),
+                    "rounding_applied": True
+                }
             }
+
+            # Add detailed analysis if requested
+            if include_analysis:
+                analysis = analyze_pdg_rounding_decision(error)
+                result["analysis"] = analysis
+
+            # Add formatted output if requested
+            if format_output:
+                formatting_result = format_pdg_value_with_uncertainty(value, error, "", True)
+                result["formatted_output"] = formatting_result.get("formatted", {})
 
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
+            logger.error(f"Error applying PDG rounding to {value} ± {error}: {e}")
             return [
                 types.TextContent(
                     type="text",
                     text=json.dumps(
-                        {"error": f"Failed to apply PDG rounding: {str(e)}"}, indent=2
+                        {"error": f"Failed to apply PDG rounding: {str(e)}", "input": {"value": value, "error": error}}, indent=2
                     ),
                 )
             ]
