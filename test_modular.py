@@ -88,20 +88,20 @@ def test_imports():
     """Test that all modules can be imported successfully."""
     try:
         # Test core module imports
-        from pdg_modules import api, data, decay, errors, measurement, particle, units, utils
+        from modules import api, data, decay, errors, measurement, particle, units, utils
         
         # Test new modules (may not exist yet)
         try:
-            from pdg_modules import config, validation, cache
+            from modules import config, validation, cache
             new_modules_count = 3
         except ImportError:
             new_modules_count = 0
         
         # Test individual components
-        from pdg_modules.api import handle_api_tools
-        from pdg_modules.errors import handle_error_tools
-        from pdg_modules.units import handle_units_tools
-        from pdg_modules.utils import safe_get_attribute
+        from modules.api import handle_api_tools
+        from modules.errors import handle_error_tools
+        from modules.units import handle_units_tools
+        from modules.utils import safe_get_attribute
         
         details = {
             'core_modules_imported': 8,
@@ -120,7 +120,7 @@ def test_imports():
 def test_configuration():
     """Test configuration system."""
     try:
-        from pdg_modules.config import config, PDGServerConfig
+        from modules.config import config, PDGServerConfig
         
         # Test config creation
         test_config = PDGServerConfig.from_environment()
@@ -150,7 +150,7 @@ def test_configuration():
 async def test_validation():
     """Test input validation system."""
     try:
-        from pdg_modules.validation import validator, ValidationResult
+        from modules.validation import validator, ValidationResult
         
         # Test particle name validation
         valid_result = validator.validate_particle_name("electron")
@@ -198,7 +198,7 @@ async def test_validation():
 async def test_caching():
     """Test caching system."""
     try:
-        from pdg_modules.cache import cache_manager, cached, MemoryCache
+        from modules.cache import cache_manager, cached, MemoryCache
         
         # Test basic cache operations
         cache = MemoryCache(max_size=10, default_ttl=60)
@@ -246,7 +246,7 @@ async def test_caching():
 async def test_api_functionality():
     """Test basic API functionality with mocking."""
     try:
-        from pdg_modules.api import handle_api_tools, get_api_tools
+        from modules.api import handle_api_tools, get_api_tools
         
         # Test that API tools are available
         api_tools = get_api_tools()
@@ -278,7 +278,7 @@ async def test_api_functionality():
 async def test_error_handling():
     """Test error handling functionality."""
     try:
-        from pdg_modules.errors import handle_error_tools, get_error_tools
+        from modules.errors import handle_error_tools, get_error_tools
         
         # Test that error tools are available
         error_tools = get_error_tools()
@@ -309,7 +309,7 @@ async def test_error_handling():
 def test_utilities():
     """Test utility functions."""
     try:
-        from pdg_modules.utils import safe_get_attribute, format_pdg_value_with_uncertainty
+        from modules.utils import safe_get_attribute, format_pdg_value_with_uncertainty
         
         # Test safe attribute access
         test_obj = type('TestObj', (), {'attr': 'value', 'nested': type('Nested', (), {'deep': 'deep_value'})()})()
@@ -339,7 +339,7 @@ def test_utilities():
 def test_module_structure():
     """Test that all expected modules and tools exist."""
     try:
-        from pdg_modules import (
+        from modules import (
             api, data, decay, errors, measurement, particle, units, utils
         )
         
@@ -405,7 +405,7 @@ async def test_integration():
             
         # Test server module import
         try:
-            import pdg_mcp_server
+            import pp_mcp_server
             server_import = True
         except:
             server_import = False
@@ -414,11 +414,11 @@ async def test_integration():
         components_working = True
         try:
             # Try to import new components if they exist
-            from pdg_modules.config import config
-            from pdg_modules.validation import validator
-            from pdg_modules.cache import cache_manager
+            from modules.config import config
+            from modules.validation import validator
+            from modules.cache import cache_manager
             
-                        # Test that all components can work together
+            # Test that all components can work together
             cache_enabled = config.cache.enabled
             validation_result = validator.validate_particle_name("proton")
             

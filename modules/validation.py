@@ -1,10 +1,3 @@
-"""
-PDG MCP Server Input Validation and Security Module
-
-Provides comprehensive input validation, sanitization, rate limiting,
-and security monitoring for all user inputs and API calls.
-"""
-
 import re
 import logging
 import time

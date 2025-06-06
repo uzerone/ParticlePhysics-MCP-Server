@@ -1,10 +1,3 @@
-"""
-PDG MCP Server Configuration Module
-
-Centralized configuration management with environment variable support,
-caching settings, connection pooling, and runtime configuration.
-"""
-
 import os
 from dataclasses import dataclass
 from typing import Optional, Dict, Any

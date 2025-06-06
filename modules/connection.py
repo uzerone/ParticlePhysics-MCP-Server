@@ -1,10 +1,3 @@
-"""
-PDG MCP Server Connection Pool Module
-
-Provides thread-safe connection pooling for PDG API connections
-with retry logic, health checking, and connection lifecycle management.
-"""
-
 import asyncio
 import time
 import logging

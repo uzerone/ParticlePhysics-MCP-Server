@@ -22,7 +22,7 @@ import sys
 from typing import Any, Dict, List, Optional
 
 # Import modular components
-from pdg_modules import api, data, decay, errors, measurement, particle, units, utils
+from modules import api, data, decay, errors, measurement, particle, units, utils
 
 
 def setup_pdg_connection():

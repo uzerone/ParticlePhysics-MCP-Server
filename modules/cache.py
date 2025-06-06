@@ -1,10 +1,3 @@
-"""
-PDG MCP Server Caching Module
-
-Provides intelligent caching for frequently accessed particle data,
-with TTL support, LRU eviction, cache statistics, and cache warming.
-"""
-
 import json
 import time
 import hashlib

@@ -41,7 +41,7 @@ from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
 # Import modular components
-from pdg_modules import api, data, decay, errors, measurement, particle, units, utils
+from modules import api, data, decay, errors, measurement, particle, units, utils
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
