@@ -14,10 +14,10 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     ]
 
 setup(
-    name="pdg-mcp-server",
+    name="ParticlePhysics-mcp-server",
     version="1.0.0",
-    author="PDG MCP Server Team",
-    author_email="contact@pdg-mcp-server.com",
+    author="uzerone, bee4come",
+    author_email="",
     description="Model Context Protocol server for Particle Data Group (PDG) physics data",
     long_description=long_description,
     long_description_content_type="text/markdown",
