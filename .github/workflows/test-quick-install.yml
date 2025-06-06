@@ -41,16 +41,16 @@ jobs:
             try:
                 with open(config) as f:
                     data = json.load(f)
-                print(f'✅ {config} is valid JSON')
+                print(f'PASS {config} is valid JSON')
                 # Basic validation for MCP server config
                 if 'mcpServers' in data:
                     for server_name, server_config in data['mcpServers'].items():
                         if 'command' in server_config and 'args' in server_config:
-                            print(f'✅ {config}: {server_name} has valid MCP structure')
+                            print(f'PASS {config}: {server_name} has valid MCP structure')
                         else:
-                            print(f'⚠️  {config}: {server_name} missing command or args')
+                            print(f'WARN {config}: {server_name} missing command or args')
             except Exception as e:
-                print(f'❌ {config} failed: {e}')
+                print(f'FAIL {config} failed: {e}')
                 exit(1)
         "
     
@@ -69,21 +69,21 @@ jobs:
       run: |
         # Test that the package can be installed
         pip install -e .
-        python -c "import pp_mcp_server; print('✅ Package imports successfully')"
+        python -c "import pp_mcp_server; print('PASS Package imports successfully')"
     
     - name: Test MCP server basic functionality
       run: |
         python -c "
         try:
             import pp_mcp_server
-            print('✅ MCP server module imports successfully')
+            print('PASS MCP server module imports successfully')
             # Test that main components exist
             if hasattr(pp_mcp_server, 'run_server'):
-                print('✅ run_server function exists')
+                print('PASS run_server function exists')
             else:
-                print('⚠️  run_server function not found')
+                print('WARN run_server function not found')
         except ImportError as e:
-            print(f'❌ Failed to import pp_mcp_server: {e}')
+            print(f'FAIL Failed to import pp_mcp_server: {e}')
             exit(1)
         "
 
@@ -114,7 +114,7 @@ jobs:
     - name: Test package installation from wheel
       run: |
         pip install dist/*.whl
-        python -c "import pp_mcp_server; print('✅ Package installed successfully from wheel')"
+        python -c "import pp_mcp_server; print('PASS Package installed successfully from wheel')"
 
   test-json-configs:
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
             try:
                 with open(config_file, 'r') as f:
                     data = json.load(f)
-                print(f'✅ {config_file}: Valid JSON')
+                print(f'PASS {config_file}: Valid JSON')
                 
                 # Validate MCP server structure
                 assert 'mcpServers' in data, 'Missing mcpServers key'
@@ -143,12 +143,12 @@ jobs:
                 assert 'command' in server, 'Missing command'
                 assert 'args' in server, 'Missing args'
                 assert server['command'] == 'uv', 'Expected uv command'
-                print(f'✅ {config_file}: Valid MCP structure')
+                print(f'PASS {config_file}: Valid MCP structure')
                 
             except Exception as e:
-                print(f'❌ {config_file}: {e}')
+                print(f'FAIL {config_file}: {e}')
                 exit(1)
         else:
-            print(f'❌ {config_file}: File not found')
+            print(f'FAIL {config_file}: File not found')
             exit(1)
         " 
