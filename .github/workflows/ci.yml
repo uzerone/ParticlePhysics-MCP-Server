@@ -30,7 +30,13 @@ jobs:
     - name: Test imports
       run: |
         python -c "import mcp.types; print('MCP imported')"
-        python -c "try: import pdg; print('PDG imported')\nexcept ImportError: print('PDG not available (expected in CI)')"
+        python -c "
+        try:
+            import pdg
+            print('PDG imported')
+        except ImportError:
+            print('PDG not available (expected in CI)')
+        "
     
     - name: Run comprehensive tests
       run: |
