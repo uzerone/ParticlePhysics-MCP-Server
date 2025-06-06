@@ -58,12 +58,15 @@ jobs:
       if: runner.os != 'Windows'
       run: |
         timeout 30s uv tool run --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to timeout/fail without PDG in CI"
+      continue-on-error: true
     
     - name: Test uvx installation (Windows)
       if: runner.os == 'Windows'
       run: |
-        # Windows timeout command
-        uv tool run --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help || echo "Expected to fail without PDG in CI"
+        # Windows - Test uv tool run command (expect it to fail in CI without PDG)
+        uv tool run --from git+https://github.com/uzerone/ParticlePhysics-MCP-Server.git pp-mcp-server --help
+        echo "Command completed with exit code: $?"
+      continue-on-error: true
     
     - name: Test package installation
       run: |
