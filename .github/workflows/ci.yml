@@ -29,29 +29,25 @@ jobs:
     
     - name: Test imports
       run: |
-        python -c "import mcp.types; print('✓ MCP imported')"
-        python -c "try: import pdg; print('✓ PDG imported')\nexcept ImportError: print('⚠ PDG not available (expected in CI)')"
+        python -c "import mcp.types; print('MCP imported')"
+        python -c "try: import pdg; print('PDG imported')\nexcept ImportError: print('PDG not available (expected in CI)')"
     
     - name: Run comprehensive tests
       run: |
         python test_modular.py
     
-    - name: Test CLI help
-      run: |
-        python pdg_cli.py --help
-    
     - name: Test server module import
       run: |
-        python -c "import pdg_mcp_server; print('✓ Server module imported')"
+        python -c "import pp_mcp_server; print('Server module imported')"
     
     - name: Validate configuration
       run: |
         python -c "
         try:
-            from pdg_modules.config import config
-            print(f'✓ Configuration loaded: {config.environment}')
+            from modules.config import config
+            print(f'Configuration loaded: {config.environment}')
         except ImportError:
-            print('⚠ Configuration module not available yet')
+            print('Configuration module not available yet')
         "
 
   lint:

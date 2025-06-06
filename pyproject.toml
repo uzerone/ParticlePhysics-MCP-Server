@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "pdg-mcp-server"
 version = "1.0.0"
 authors = [
-    {name = "uzerone", email = ""},
-    {name = "bee4come", email = ""},
+    {name = "uzerone"},
+    {name = "bee4come"},
 ]
 description = "Model Context Protocol server for Particle Data Group (PDG) data access"
 readme = "README.md"
@@ -45,19 +45,18 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/uzerone/pdg-mcp-server"
-Documentation = "https://github.com/uzerone/pdg-mcp-server#readme"
-Repository = "https://github.com/uzerone/pdg-mcp-server"
-Issues = "https://github.com/uzerone/pdg-mcp-server/issues"
+Homepage = "https://github.com/uzerone/ParticlePhysics-MCP-Server"
+Documentation = "https://github.com/uzerone/ParticlePhysics-MCP-Server#readme"
+Repository = "https://github.com/uzerone/ParticlePhysics-MCP-Server"
+Issues = "https://github.com/uzerone/ParticlePhysics-MCP-Server/issues"
 "PDG Website" = "https://pdg.lbl.gov/"
 "PDG API Docs" = "https://pdgapi.lbl.gov/doc/"
 
 [project.scripts]
-pdg-mcp-server = "pdg_mcp_server:run_server"
-pdg-cli = "pdg_cli:main"
+pp-mcp-server = "pp_mcp_server:run_server"
 
 [tool.setuptools.packages.find]
-include = ["pdg_modules*"]
+include = ["modules*"]
 
 [tool.black]
 line-length = 88
@@ -82,7 +81,7 @@ extend-exclude = '''
 profile = "black"
 multi_line_output = 3
 line_length = 88
-known_first_party = ["pdg_modules"]
+known_first_party = ["modules"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -94,7 +93,7 @@ python_functions = ["test_*"]
 asyncio_mode = "auto"
 
 [tool.coverage.run]
-source = ["pdg_modules", "pdg_mcp_server", "pdg_cli"]
+source = ["modules", "pp_mcp_server"]
 omit = ["*/tests/*", "*/test_*.py"]
 
 [tool.coverage.report]

@@ -62,7 +62,7 @@ class TestSuite:
             test_result = TestResult(test_name, success, duration, error, details)
             self.results.append(test_result)
             
-            status = "✓ PASS" if success else "✗ FAIL"
+            status = "PASS" if success else "FAIL"
             logger.info(f"{status} {test_name} ({duration:.3f}s)")
             
             if error:
@@ -77,7 +77,7 @@ class TestSuite:
             test_result = TestResult(test_name, False, duration, error_msg)
             self.results.append(test_result)
             
-            logger.error(f"✗ FAIL {test_name} ({duration:.3f}s)")
+            logger.error(f"FAIL {test_name} ({duration:.3f}s)")
             logger.error(f"Exception: {error_msg}")
             logger.debug(traceback.format_exc())
             
@@ -499,15 +499,15 @@ async def run_all_tests():
     # Final assessment
     logger.info("\n" + "=" * 70)
     if passed == total:
-        logger.info("🎉 ALL TESTS PASSED! The PDG MCP Server is working correctly.")
+        logger.info("ALL TESTS PASSED! The PDG MCP Server is working correctly.")
         return True
     else:
         failed_tests = [r for r in suite.results if not r.success]
         if len(failed_tests) <= 2 and all('not available yet' in str(r.error) or 'skipped' in str(r.details) for r in failed_tests):
-            logger.info("✅ CORE TESTS PASSED! Some optional components are not available yet.")
+            logger.info("CORE TESTS PASSED! Some optional components are not available yet.")
             return True
         else:
-            logger.error(f"❌ {total - passed} TESTS FAILED. Please review the issues above.")
+            logger.error(f"{total - passed} TESTS FAILED. Please review the issues above.")
             return False
 
 

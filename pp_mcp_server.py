@@ -1,34 +1,4 @@
 #!/usr/bin/env python3
-"""
-PDG (Particle Data Group) MCP Server
-
-This MCP server provides access to particle physics data from the Particle Data Group
-through their Python API. It allows users to search for particles, get their properties,
-branching fractions, and other physics data in a user-friendly way.
-
-Organized into 8 specialized modules:
-- api: Core API functionality (search, properties, etc.)
-- data: Data handling and measurements
-- decay: Decay analysis and branching fractions
-- errors: Error handling and diagnostics
-- measurement: PDG measurement objects and analysis
-- particle: PDG particle objects and quantum numbers
-- units: Unit conversions and physics constants
-- utils: PDG utility functions and data processing
-
-Features:
-- 64 MCP tools across 8 specialized modules
-- Search particles by name, Monte Carlo ID, or PDG ID
-- Get particle properties (mass, lifetime, quantum numbers, etc.)
-- Access branching fractions and decay information
-- Get measurements and references
-- List all available particles
-- Advanced data handling and measurements
-- Decay analysis with subdecay support
-- Comprehensive error handling and diagnostics
-- Physics unit conversions and constants
-- PDG utility functions and data processing
-"""
 
 import asyncio
 import json
@@ -45,7 +15,7 @@ from modules import api, data, decay, errors, measurement, particle, units, util
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("pdg-mcp-server")
+logger = logging.getLogger("pp-mcp-server")
 
 # Global variable to store the PDG API connection
 pdg_api = None
@@ -70,7 +40,7 @@ def ensure_pdg_connection():
 
 
 # Create the MCP server
-server = Server("pdg-server")
+server = Server("pp-server")
 
 
 @server.list_tools()
@@ -162,7 +132,7 @@ async def main():
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="pdg-server",
+                server_name="pp-server",
                 server_version="2.0.0",
                 capabilities=server.get_capabilities(
                     notification_options=NotificationOptions(),
@@ -184,7 +154,7 @@ def run_server():
 
 
 if __name__ == "__main__":
-    logger.info("Starting PDG MCP Server...")
+    logger.info("Starting PDG MCP Server (Pure MCP Interface)...")
     logger.info(
         "Available modules: api, data, decay, errors, measurement, particle, units, utils"
     )
