@@ -75,7 +75,7 @@ def test_server_functions():
 
 
 def test_module_tools():
-    """Test that module tools can be loaded."""
+    """Test that module tools can be loaded and we have exactly 64 tools."""
     print("Testing module tools...")
 
     try:
@@ -97,26 +97,57 @@ def test_module_tools():
         units_tools = get_units_tools()
         utils_tools = get_utils_tools()
 
-        total_tools = (
-            len(api_tools)
-            + len(data_tools)
-            + len(decay_tools)
-            + len(error_tools)
-            + len(measurement_tools)
-            + len(particle_tools)
-            + len(units_tools)
-            + len(utils_tools)
+        # Count tools per module
+        tool_counts = {
+            "API": len(api_tools),
+            "Data": len(data_tools),
+            "Decay": len(decay_tools),
+            "Error": len(error_tools),
+            "Measurement": len(measurement_tools),
+            "Particle": len(particle_tools),
+            "Units": len(units_tools),
+            "Utils": len(utils_tools),
+        }
+
+        total_tools = sum(tool_counts.values())
+        expected_tools = 64
+
+        print(f"✅ Loaded {total_tools} tools across 8 modules:")
+        for module_name, count in tool_counts.items():
+            print(f"   - {module_name} tools: {count}")
+
+        # Validate we have exactly 64 tools
+        if total_tools == expected_tools:
+            print(f"✅ Tool count validation: {total_tools}/{expected_tools} tools (correct)")
+        else:
+            print(f"❌ Tool count validation: {total_tools}/{expected_tools} tools (incorrect)")
+            print(f"   Expected {expected_tools} tools but found {total_tools}")
+            return False
+
+        # Validate each tool has required attributes
+        all_tools = (
+            api_tools
+            + data_tools
+            + decay_tools
+            + error_tools
+            + measurement_tools
+            + particle_tools
+            + units_tools
+            + utils_tools
         )
 
-        print(f"✅ Loaded {total_tools} tools across 8 modules")
-        print(f"   - API tools: {len(api_tools)}")
-        print(f"   - Data tools: {len(data_tools)}")
-        print(f"   - Decay tools: {len(decay_tools)}")
-        print(f"   - Error tools: {len(error_tools)}")
-        print(f"   - Measurement tools: {len(measurement_tools)}")
-        print(f"   - Particle tools: {len(particle_tools)}")
-        print(f"   - Units tools: {len(units_tools)}")
-        print(f"   - Utils tools: {len(utils_tools)}")
+        invalid_tools = []
+        for i, tool in enumerate(all_tools):
+            if not hasattr(tool, "name") or not hasattr(tool, "description"):
+                invalid_tools.append(f"Tool {i}: missing name or description")
+
+        if invalid_tools:
+            print(f"❌ Found {len(invalid_tools)} invalid tools:")
+            for invalid in invalid_tools[:5]:  # Show first 5
+                print(f"   {invalid}")
+            return False
+        else:
+            print(f"✅ All {total_tools} tools have valid structure")
 
     except Exception as e:
         print(f"❌ Error loading module tools: {e}")
@@ -181,12 +212,13 @@ def run_all_tests():
     """Run all tests and return success status."""
     print("=" * 60)
     print("ParticlePhysics MCP Server - Basic Test Suite")
+    print("Expected: 64 tools across 8 modules")
     print("=" * 60)
 
     tests = [
         ("Import Tests", test_imports),
         ("Server Function Tests", test_server_functions),
-        ("Module Tools Tests", test_module_tools),
+        ("Module Tools Tests (64 tools)", test_module_tools),
         ("Configuration Tests", test_configuration),
         ("JSON Config Tests", test_json_config),
     ]
@@ -213,7 +245,7 @@ def run_all_tests():
     print("=" * 60)
 
     if failed == 0:
-        print("🎉 All tests passed!")
+        print("🎉 All tests passed! 64 tools verified and ready.")
         return True
     else:
         print("💥 Some tests failed!")
