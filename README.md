@@ -116,6 +116,20 @@ python -c "import pdg; print('✓ PDG API ready')"
 - **PDG Python API** (automatically installed)
 - **MCP Framework** (for AI assistant integration)
 
+## Authors
+
+**PDG MCP Server Team**
+- Primary development and architecture
+- Enhanced MCP integration and tool design
+- Comprehensive testing and documentation
+
+**Contributors**
+- Community feedback and improvements
+- Bug reports and feature requests
+- Documentation enhancements
+
+Built with ❤️ for the particle physics and AI community.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
@@ -128,7 +142,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Links
 
 - **PDG Website**: https://pdg.lbl.gov/
-- **PDG Python API**: https://github.com/particledatagroup/api
+- **PDG Python API**: https://github.com/particledatagroup/api  
 - **MCP Protocol**: https://modelcontextprotocol.io/
 - **Repository**: https://github.com/uzerone/PDG-MCP-Server
 
