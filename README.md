@@ -36,9 +36,4 @@ This project is maintained by:
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-**Note**: This project includes dependencies with different licenses:
-- PDG MCP Server: MIT License
-- PDG Python API: BSD-3-Clause License (Lawrence Berkeley National Laboratory)
-- PDG Data: CC BY 4.0 License (Particle Data Group)
-
 ---
