@@ -1,6 +1,6 @@
 # ParticlePhysics MCP Server
 
-A **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). This production-ready server enables AI assistants and applications to query comprehensive particle physics information through 60 specialized tools across 8 modules with enterprise-grade security, caching, and performance features.
+A **Model Context Protocol (MCP) server** that provides seamless access to particle physics data from the [Particle Data Group (PDG)](https://pdg.lbl.gov/). This production-ready server enables AI assistants and applications to query comprehensive particle physics information through 64 specialized tools across 8 modules with enterprise-grade security, caching, and performance features.
 
 ## Installation (No Local Setup Required)
 
