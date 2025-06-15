@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Setup script for PDG MCP Server
+Setup script for ParticlePhysics MCP Server
 """
 
 from setuptools import find_packages, setup

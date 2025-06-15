@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-PDG MCP Server Usage Examples
+v MCP Server Usage Examples
 
-This file demonstrates various ways to use the PDG MCP server
+This file demonstrates various ways to use the ParticlePhysics MCP server
 for particle physics research tasks.
 """
 
@@ -11,13 +11,13 @@ import json
 from typing import Any, Dict
 
 # Import the MCP server module
-import pdg_mcp_server as pdg_server
+import pp_mcp_server
 
 
 async def call_tool(tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
     """Helper function to call a tool and return parsed JSON result."""
     try:
-        result = await pdg_server.handle_call_tool(tool_name, arguments)
+        result = await pp_mcp_server.handle_call_tool(tool_name, arguments)
         if result and len(result) > 0:
             return json.loads(result[0].text)
         return {"error": "No result returned"}
