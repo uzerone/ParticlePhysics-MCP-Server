@@ -5,7 +5,11 @@ This is a minimal test to ensure the CI workflow runs successfully.
 """
 
 import sys
+import os
 import traceback
+
+# Add parent directory to path to import pp_mcp_server and modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def test_imports():

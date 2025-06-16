@@ -40,7 +40,7 @@ jobs:
     
     - name: Run comprehensive tests
       run: |
-        python test_modular.py
+        python tests/test_modular.py
     
     - name: Test server module import
       run: |

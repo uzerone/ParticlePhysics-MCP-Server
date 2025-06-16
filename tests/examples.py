@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-v MCP Server Usage Examples
+MCP Server Usage Examples
 
 This file demonstrates various ways to use the ParticlePhysics MCP server
 for particle physics research tasks.
@@ -8,7 +8,12 @@ for particle physics research tasks.
 
 import asyncio
 import json
+import sys
+import os
 from typing import Any, Dict
+
+# Add parent directory to path to import pp_mcp_server
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import the MCP server module
 import pp_mcp_server
