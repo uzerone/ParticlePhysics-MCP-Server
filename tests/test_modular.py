@@ -4,8 +4,8 @@ Basic test suite for ParticlePhysics MCP Server
 This is a minimal test to ensure the CI workflow runs successfully.
 """
 
-import sys
 import os
+import sys
 import traceback
 
 # Add parent directory to path to import pp_mcp_server and modules

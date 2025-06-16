@@ -8,8 +8,8 @@ for particle physics research tasks.
 
 import asyncio
 import json
-import sys
 import os
+import sys
 from typing import Any, Dict
 
 # Add parent directory to path to import pp_mcp_server
