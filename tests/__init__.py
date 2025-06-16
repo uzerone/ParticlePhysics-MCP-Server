@@ -9,4 +9,4 @@ This package contains comprehensive tests for the MCP server including:
 """
 
 __version__ = "1.0.0"
-__author__ = "ParticlePhysics MCP Server Team" 
+__author__ = "ParticlePhysics MCP Server Team"
