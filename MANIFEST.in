@@ -2,5 +2,7 @@ include README.md
 include LICENSE
 include requirements.txt
 include *.py
+include pp_mcp_server.py
+include pp_mcp_help.py
 recursive-include modules *.py
 include modules/__init__.py 

@@ -26,6 +26,15 @@ Simply add this to your `claude_desktop_config.json`:
 
 **That's it!** No local installation needed. The server will be automatically downloaded and run when needed.
 
+## Getting Help - Tool Documentation
+
+### For LLMs and External Systems
+To see all available tools and their parameters, use the help command:
+
+```bash
+# Simple list of all tools
+pp-mcp-help
+
 ## Maintainers
 
 This project is maintained by:

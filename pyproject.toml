@@ -54,6 +54,7 @@ Issues = "https://github.com/uzerone/ParticlePhysics-MCP-Server/issues"
 
 [project.scripts]
 pp-mcp-server = "pp_mcp_server:run_server"
+pp-mcp-help = "pp_mcp_help:main"
 
 [tool.setuptools.packages.find]
 include = ["modules*"]

@@ -22,6 +22,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/uzerone/ParticlePhysics-MCP-Server",
     packages=find_packages(),
+    py_modules=["pp_mcp_server", "pp_mcp_help"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -50,6 +51,7 @@ setup(
     entry_points={
         "console_scripts": [
             "pp-mcp-server=pp_mcp_server:run_server",
+            "pp-mcp-help=pp_mcp_help:main",
         ],
     },
     project_urls={

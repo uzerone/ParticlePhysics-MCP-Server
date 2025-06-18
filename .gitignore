@@ -147,4 +147,9 @@ Thumbs.db
 *.tmp
 *.temp
 temp/
-tmp/ 
+tmp/
+
+# Generated documentation
+tools.json
+TOOLS.md
+tools.md 
