@@ -34,6 +34,22 @@ To see all available tools and their parameters, use the help command:
 # Simple list of all tools
 pp-mcp-help
 
+# Generate documentation for LLMs
+pp-mcp-help --format llm
+
+# Generate detailed markdown documentation
+pp-mcp-help --format markdown --output tools.md
+
+# Generate JSON format for programmatic access
+pp-mcp-help --format json --output tools.json
+```
+
+### Available Help Formats:
+- **simple** (default): Quick list of all tools with descriptions
+- **llm**: Optimized format for LLM consumption with examples
+- **markdown**: Detailed documentation with full parameter descriptions
+- **json**: Structured data for programmatic parsing
+
 ## Maintainers
 
 This project is maintained by:
