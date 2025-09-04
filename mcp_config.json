@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "particlephysics": {
+      "command": "uvx",
+      "args": ["--from", ".", "python", "-m", "particlephysics_mcp_server"]
+    }
+  }
+}
