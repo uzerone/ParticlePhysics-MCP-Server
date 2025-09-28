@@ -1,5 +1,7 @@
 # ParticlePhysics MCP Server
 
+[![MCP Badge](https://lobehub.com/badge/mcp/uzerone-particlephysics-mcp-server)](https://lobehub.com/mcp/uzerone-particlephysics-mcp-server)
+
 A Model Context Protocol (MCP) server that provides access to the particle data. This server enables Claude Desktop and other MCP clients to search and retrieve particle physics data in real-time.
 
 ## Status and Progress
