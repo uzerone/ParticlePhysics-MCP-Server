@@ -4,7 +4,8 @@ A Model Context Protocol (MCP) server that provides access to the particle data.
 
 ## Status and Progress
 
-- 🛠️ Work on displaying particle values with associated errors is ongoing.
+- Work on displaying particle values with associated errors is ongoing.
+- Next: deploy the server so it can run 24/7 remotely and be used by LLMs or IDEs.
 
 ## Configuration
 
@@ -29,33 +30,6 @@ Returns key properties inline.
 ### `list_decays`
 Returns all decay modes for a specified particle.
 - **particle_id** (required): Name, symbol, or PDG ID of the particle.
-
-## Local Testing
-
-- Install dependencies:
-```
-python -m pip install -r requirements.txt
-```
-
-- To use the inspector, run the restart script:
-```
-./restart_mcp_inspector.sh
-```
-
-- To run end-to-end tests with Playwright:
-```
-uvx pytest tests/test_e2e_playwright.py
-```
-
-- Or run tests directly with Python:
-```
-python -m pytest tests/test_e2e_playwright.py
-```
-
-- Run helper/unit and tool tests:
-```
-python -m pytest tests/test_helpers.py tests/test_tools.py
-```
 
 ## VS Code Skill
 
