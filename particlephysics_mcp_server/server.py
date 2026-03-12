@@ -890,6 +890,9 @@ async def search_particle(arguments: dict) -> list[types.TextContent]:
             try:
                 # Basic particle information
                 result_text += f"{i+1}. {particle.description or 'Unknown particle'}\n"
+                particle_name = getattr(particle, "name", None)
+                if particle_name:
+                    result_text += f"   Name: {particle_name}\n"
                 # If query suggests anti-particle, flip sign-displayed quantities
                 anti_view = _is_anti_query(query)
                 if anti_view:
@@ -897,7 +900,12 @@ async def search_particle(arguments: dict) -> list[types.TextContent]:
                         "   Note: For antiparticles, mass and spin are identical to the particle; "
                         "charges and additive quantum numbers appear with opposite sign.\n"
                     )
-                result_text += f"   PDG ID: {particle.pdgid}\n"
+                mcid = getattr(particle, "mcid", None)
+                pdg_review_id = getattr(particle, "pdgid", None)
+                if mcid is not None:
+                    result_text += f"   PDG ID: {mcid}\n"
+                if pdg_review_id is not None:
+                    result_text += f"   PDG Review ID: {pdg_review_id}\n"
                 
                 # Mass (MeV and GeV) with quark fallback to measurement text
                 mass_line_emitted = False

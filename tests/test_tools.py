@@ -22,6 +22,7 @@ def test_search_particle_electron():
     assert "Found" in text
     assert "Mass:" in text
     assert "Charge:" in text
+    assert "PDG Review ID:" in text
 
 
 def test_search_particle_higgs():
