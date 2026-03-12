@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import subprocess
+import shutil
 import json
 from fractions import Fraction
 from typing import Any, Sequence
@@ -18,24 +19,28 @@ from typing import Any, Sequence
 def setup_module_paths():
     """Find and add the correct paths for MCP and PDG modules."""
     try:
+        if shutil.which("uvx") is None:
+            return
         # Get the location of installed packages using uvx
         result = subprocess.run(['uvx', 'pip', 'show', 'mcp'], 
-                              capture_output=True, text=True, check=True)
-        for line in result.stdout.split('\n'):
-            if line.startswith('Location:'):
-                mcp_path = line.split(':', 1)[1].strip()
-                if mcp_path not in sys.path:
-                    sys.path.insert(0, mcp_path)
-                break
+                              capture_output=True, text=True, check=False)
+        if result.returncode == 0:
+            for line in result.stdout.split('\n'):
+                if line.startswith('Location:'):
+                    mcp_path = line.split(':', 1)[1].strip()
+                    if mcp_path not in sys.path:
+                        sys.path.insert(0, mcp_path)
+                    break
         
         result = subprocess.run(['uvx', 'pip', 'show', 'pdg'], 
-                              capture_output=True, text=True, check=True)
-        for line in result.stdout.split('\n'):
-            if line.startswith('Location:'):
-                pdg_path = line.split(':', 1)[1].strip()
-                if pdg_path not in sys.path:
-                    sys.path.insert(0, pdg_path)
-                break
+                              capture_output=True, text=True, check=False)
+        if result.returncode == 0:
+            for line in result.stdout.split('\n'):
+                if line.startswith('Location:'):
+                    pdg_path = line.split(':', 1)[1].strip()
+                    if pdg_path not in sys.path:
+                        sys.path.insert(0, pdg_path)
+                    break
     except Exception as e:
         logging.warning(f"Could not automatically find module paths: {e}")
 
@@ -164,10 +169,14 @@ def _to_float(value: Any) -> float | None:
         return float(value)
     except Exception:
         try:
-            # Sometimes PDG may provide strings with units; strip non-numeric
+            # Sometimes PDG may provide strings with units; parse numeric prefix
             s = str(value).strip()
-            # Keep digits, dot, minus, exponent, and slash (handled later)
-            return float(s)
+            # Extract a leading float literal (with optional exponent)
+            import re
+            match = re.match(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", s)
+            if match:
+                return float(match.group(0))
+            return None
         except Exception:
             return None
 
@@ -402,7 +411,8 @@ def _find_particle_by_alias(api, particle_id: str):
     # Start from generated mappings if available
     generated = _load_name_mappings()
     # Common aliases for well-known particles (using actual PDG names), used as fallback/augmentation
-    common_aliases = {
+    # Normalize to lowercase keys for case-insensitive lookup.
+    common_aliases_raw = {
         # Photons
         'photon': 'gamma',
         'gamma': 'gamma',
@@ -601,6 +611,7 @@ def _find_particle_by_alias(api, particle_id: str):
         't_bar': 't_bar',
         't~': 't_bar'
     }
+    common_aliases = {k.lower(): v for k, v in common_aliases_raw.items()}
     
     def get_individual_particle(particle_list):
         """Return a concrete PDG particle if available; otherwise return input as-is."""
@@ -674,10 +685,11 @@ def _find_particle_by_alias(api, particle_id: str):
             except:
                 pass
     
-    # Try generated mappings first
+    # Try generated mappings first (case-insensitive)
     for term in candidate_terms:
-        if term in generated:
-            mapped = generated[term]
+        term_key = term.lower()
+        if term_key in generated:
+            mapped = generated[term_key]
             try:
                 result = api.get_particle_by_name(mapped)
                 if result:
@@ -709,10 +721,11 @@ def _find_particle_by_alias(api, particle_id: str):
                         except:
                             pass
 
-    # Try common aliases as fallback
+    # Try common aliases as fallback (case-insensitive)
     for term in candidate_terms:
-        if term in common_aliases:
-            mapped = common_aliases[term]
+        term_key = term.lower()
+        if term_key in common_aliases:
+            mapped = common_aliases[term_key]
             try:
                 # Try to get the particle by name first
                 result = api.get_particle_by_name(mapped)
@@ -888,10 +901,14 @@ async def search_particle(arguments: dict) -> list[types.TextContent]:
                 
                 # Mass (MeV and GeV) with quark fallback to measurement text
                 mass_line_emitted = False
-                if hasattr(particle, 'mass') and particle.mass is not None:
-                    mev, gev = _format_mass_mev_gev(particle.mass)
-                    result_text += f"   Mass: {mev} MeV ({gev} GeV)\n"
-                    mass_line_emitted = True
+                try:
+                    if hasattr(particle, 'mass') and particle.mass is not None:
+                        mev, gev = _format_mass_mev_gev(particle.mass)
+                        result_text += f"   Mass: {mev} MeV ({gev} GeV)\n"
+                        mass_line_emitted = True
+                except Exception:
+                    # Some PDG entries (e.g., quarks) may not expose a best mass
+                    mass_line_emitted = False
                 if not mass_line_emitted and _is_quark(particle):
                     qm = _format_quark_mass_from_measurements(particle)
                     if qm:

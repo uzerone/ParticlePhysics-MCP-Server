@@ -1,7 +1,5 @@
 # ParticlePhysics MCP Server
 
-[![MCP Badge](https://lobehub.com/badge/mcp/uzerone-particlephysics-mcp-server)](https://lobehub.com/mcp/uzerone-particlephysics-mcp-server)
-
 A Model Context Protocol (MCP) server that provides access to the particle data. This server enables Claude Desktop and other MCP clients to search and retrieve particle physics data in real-time.
 
 ## Status and Progress
@@ -30,9 +28,14 @@ Returns key properties inline.
 
 ### `list_decays`
 Returns all decay modes for a specified particle.
-- **query** (required): Name or symbol of the particle.
+- **particle_id** (required): Name, symbol, or PDG ID of the particle.
 
 ## Local Testing
+
+- Install dependencies:
+```
+python -m pip install -r requirements.txt
+```
 
 - To use the inspector, run the restart script:
 ```
@@ -44,11 +47,27 @@ Returns all decay modes for a specified particle.
 uvx pytest tests/test_e2e_playwright.py
 ```
 
+- Or run tests directly with Python:
+```
+python -m pytest tests/test_e2e_playwright.py
+```
+
+- Run helper/unit and tool tests:
+```
+python -m pytest tests/test_helpers.py tests/test_tools.py
+```
+
+## VS Code Skill
+
+This repo includes a VS Code Copilot skill that documents the MCP workflow:
+- [ .github/skills/particlephysics-skill/SKILL.md ](.github/skills/particlephysics-skill/SKILL.md)
+
+Trigger it with phrases like "mcp inspector", "particle physics mcp", or "pp".
+
 ## Maintainers
 
 This project is developed and maintained by:
 - [@uzerone](https://github.com/uzerone)
-- [@bee4come](https://github.com/bee4come)
 
 ## License
 
