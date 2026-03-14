@@ -1,14 +1,10 @@
 # ParticlePhysics MCP Server
 
-A Model Context Protocol (MCP) server that provides access to the particle data. This server enables Claude Desktop and other MCP clients to search and retrieve particle physics data in real-time.
+Minimal MCP server for particle physics data.
 
-## Status and Progress
+It lets MCP clients (Claude Desktop, IDEs, etc.) query particles and decay modes quickly.
 
-- Work on displaying particle values with associated errors is ongoing.
-- Next: deploy the server so it can run 24/7 remotely and be used by LLMs or IDEs.
-
-## Configuration
-
+## Quick Config
 
 ```json
 {
@@ -33,21 +29,14 @@ Returns all decay modes for a specified particle.
 
 ## VS Code Skill
 
-This repo includes a VS Code Copilot skill that documents the MCP workflow:
-- [ .github/skills/particlephysics-skill/SKILL.md ](.github/skills/particlephysics-skill/SKILL.md)
+- Skill file: `.github/skills/particlephysics-skill/SKILL.md`
+- Trigger phrase: `particle physics mcp` or `pp`
 
-Trigger it with phrases like "mcp inspector", "particle physics mcp", or "pp".
+## Maintainer
 
-## Maintainers
-
-This project is developed and maintained by:
 - [@uzerone](https://github.com/uzerone)
 
 ## License
 
-MIT License - see [LICENSE](LICENSE).
-
-## References
-- [Model Context Protocol](https://modelcontextprotocol.io/docs/getting-started/intro)
-- [Particle Data Group](https://pdg.lbl.gov/)
+MIT - see `LICENSE`.
 
