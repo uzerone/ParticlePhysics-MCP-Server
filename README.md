@@ -9,6 +9,19 @@ Supports natural-language queries (`muon plus`, `pion zero`, `antiproton`, `anti
 case-insensitive lookup, MC IDs (`-13`), and returns both human-readable text and a
 structured JSON payload.
 
+## Table of Contents
+
+- [Features](#features)
+- [Install](#install)
+- [Configure your MCP client](#configure-your-mcp-client)
+- [Tools](#tools)
+  - [`search_particle`](#search_particle)
+  - [`list_decays`](#list_decays)
+- [Claude Skill](#claude-skill)
+- [Changelog](#changelog)
+- [Maintainer](#maintainer)
+- [License](#license)
+
 ## Features
 
 - `search_particle` — mass (MeV + GeV), charge, spin, color, parity / C / I / G,
