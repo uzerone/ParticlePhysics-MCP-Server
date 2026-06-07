@@ -17,7 +17,6 @@ structured JSON payload.
 - [Tools](#tools)
   - [`search_particle`](#search_particle)
   - [`list_decays`](#list_decays)
-- [Claude Skill](#claude-skill)
 - [Changelog](#changelog)
 - [Maintainer](#maintainer)
 - [License](#license)
@@ -150,12 +149,6 @@ Decay modes for particle 'tau':
 }
 ```
 ````
-
-## Claude Skill
-
-A Claude Code skill spec lives at [`.github/skills/particlephysics-skill/SKILL.md`](.github/skills/particlephysics-skill/SKILL.md). It runs the inspector, validates both tools, and exercises the natural-language / anti-particle / MC ID query surface.
-
-Trigger phrase: `particle physics mcp` or `pp`.
 
 ## Changelog
 
