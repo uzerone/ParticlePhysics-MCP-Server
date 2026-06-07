@@ -1,2 +1,0 @@
-- [No emoji in any output](feedback_no_emoji.md) — strip emojis from code, docs, commits, chat
-- [README scope and tone](feedback_readme_scope.md) — no Development section, no "Particle Data Group" / pdg.lbl.gov references, no emojis

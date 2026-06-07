@@ -15,3 +15,7 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+
+# Claude Code memory and config
+memory/
+.claude/
